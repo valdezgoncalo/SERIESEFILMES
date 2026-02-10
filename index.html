@@ -3,80 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineTrack Pro - Fix Final</title>
+    <title>CineTrack Pro - Gestão de Progresso</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root { 
-            --accent: #facc15; --bg: #05080f; --card: #161e2e; 
-            --text-main: #ffffff; --text-dim: #94a3b8; --blue: #38bdf8;
+            --accent: #facc15; 
+            --bg: #0b0f1a; 
+            --card: #1e293b; 
+            --text-main: #ffffff; 
+            --text-dim: #94a3b8; 
+            --blue: #38bdf8;
+            --green: #22c55e;
         }
 
         body { 
-            background-color: var(--bg); color: var(--text-main); 
-            font-family: 'Segoe UI', system-ui, sans-serif; padding-bottom: 50px;
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            padding-bottom: 50px;
         }
 
-        /* Pesquisa com Z-Index Elevado */
-        .search-container { position: relative; max-width: 600px; margin: 0 auto; z-index: 2000; }
+        /* Stats Dashboard */
+        .stats-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid #334155; border-radius: 15px; padding: 15px; margin-bottom: 20px; }
+        .stat-val { font-size: 1.3rem; font-weight: bold; color: var(--blue); }
+        .stat-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; }
+
+        /* Search */
+        .search-container { position: relative; max-width: 600px; margin: 0 auto; z-index: 1050; }
         #suggestions { 
             position: absolute; top: 100%; left: 0; right: 0; 
-            background: #111827; border: 2px solid var(--blue); border-radius: 0 0 12px 12px; 
-            display: none; max-height: 400px; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+            background: #1a202c; border: 1px solid #334155; 
+            border-radius: 0 0 12px 12px; display: none;
+            max-height: 400px; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
-        .suggestion-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #1f2937; display: flex; align-items: center; transition: 0.2s; }
-        .suggestion-item:hover { background: #1c263b; }
-        .suggestion-item img { width: 40px; height: 55px; margin-right: 15px; border-radius: 4px; object-fit: cover; pointer-events: none; }
+        .suggestion-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #334155; display: flex; align-items: center; }
+        .suggestion-item:hover { background: #2d3748; }
+        .suggestion-item img { width: 40px; height: 60px; margin-right: 15px; border-radius: 4px; object-fit: cover; }
 
-        /* Lista Principal */
-        .movie-card { 
-            background: var(--card); border-radius: 12px; border: 1px solid #1f2937; 
-            padding: 12px; margin-bottom: 12px; cursor: pointer; transition: 0.2s;
-        }
+        /* Cards */
+        .movie-card { background: var(--card); border-radius: 15px; border: 1px solid #334155; padding: 15px; margin-bottom: 12px; cursor: pointer; transition: 0.3s; position: relative; }
         .movie-card:hover { border-color: var(--blue); transform: translateY(-2px); }
-        
-        /* Modal e Sinopse */
-        .modal-content { background-color: #0b1120; border: 1px solid #334155; color: white; border-radius: 20px; overflow: hidden; }
-        .modal-backdrop-img { width: 100%; height: 260px; object-fit: cover; mask-image: linear-gradient(to bottom, black 50%, transparent 100%); }
-        .synopsis-box { background: rgba(255, 255, 255, 0.08); padding: 15px; border-radius: 10px; color: #ffffff !important; font-size: 0.95rem; line-height: 1.6; border-left: 4px solid var(--blue); }
-        
-        /* Elenco Scroll */
-        .cast-scroll { display: flex; gap: 15px; overflow-x: auto; padding: 10px 0; }
-        .cast-item { flex: 0 0 80px; text-align: center; cursor: pointer; }
-        .cast-img { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid transparent; }
-        .cast-item:hover .cast-img { border-color: var(--blue); }
+        .star-rating { color: var(--accent); font-size: 1rem; }
+        .status-badge { font-size: 0.65rem; padding: 3px 10px; border-radius: 10px; margin-top: 5px; display: inline-block; }
 
-        #undoBanner { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 3000; background: var(--accent); color: black; font-weight: bold; padding: 12px 25px; border-radius: 50px; }
+        /* Modal Details */
+        .modal-content { background-color: #0f172a; border: 1px solid var(--blue); color: white; border-radius: 20px; overflow: hidden; }
+        .synopsis-box { background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 10px; border-left: 3px solid var(--blue); margin-bottom: 15px; font-size: 0.9rem; }
+        .comment-area { background: #1e293b; border: 1px solid #334155; color: white; border-radius: 10px; padding: 10px; font-size: 0.9rem; width: 100%; min-height: 70px; }
+        
+        /* Progression Controls */
+        .progression-box { background: rgba(56, 189, 248, 0.1); border: 1px dashed var(--blue); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
+
+        #undoBanner { display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 9999; background: var(--accent); color: #000; font-weight: bold; padding: 12px 25px; border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.4); }
     </style>
 </head>
 <body>
 
-<div id="undoBanner">Alteração desfeita! <button class="btn btn-sm btn-dark ms-2 rounded-pill" onclick="undoLastAction()">ANULAR</button></div>
+<div id="undoBanner">
+    Ação registada! <button class="btn btn-sm btn-dark ms-3 rounded-pill" onclick="undoLastAction()">ANULAR</button>
+</div>
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold m-0 text-blue">🎬 CineTrack Pro</h4>
+        <h3 class="fw-bold m-0">🎬 CineTrack <span style="color:var(--blue)">Pro</span></h3>
         <div>
-            <button class="btn btn-sm btn-outline-light" onclick="exportData()">Backup</button>
+            <button class="btn btn-sm btn-outline-light me-2" onclick="exportData()">Backup</button>
             <button class="btn btn-sm btn-outline-info" onclick="document.getElementById('importFile').click()">Importar</button>
             <input type="file" id="importFile" style="display:none" onchange="importData(event)">
         </div>
     </div>
 
-    <div id="statsPanel" class="row g-2 mb-4"></div>
+    <div id="statsPanel" class="row g-3 mb-4"></div>
 
     <div class="search-container mb-4">
-        <div class="input-group input-group-lg">
-            <span class="input-group-text bg-dark border-secondary">🔍</span>
+        <div class="input-group shadow-sm">
+            <span class="input-group-text bg-dark border-secondary text-muted">🔍</span>
             <input type="text" id="movieInput" class="form-control bg-dark text-white border-secondary" 
-                   placeholder="Pesquisar filme, série ou ator..." onkeyup="getSuggestions(this.value)" autocomplete="off">
+                   placeholder="Pesquisar..." oninput="getSuggestions(this.value)" autocomplete="off">
         </div>
-        <div id="suggestions"></div>
+        <div id="suggestions" class="shadow-lg"></div>
     </div>
 
     <div class="d-flex justify-content-center gap-2 mb-4">
-        <button class="btn btn-sm btn-outline-secondary rounded-pill active" onclick="setFilter('all', this)">Tudo</button>
-        <button class="btn btn-sm btn-outline-primary rounded-pill" onclick="setFilter('movie', this)">Filmes</button>
-        <button class="btn btn-sm btn-outline-success rounded-pill" onclick="setFilter('tv', this)">Séries</button>
+        <button class="btn btn-sm btn-outline-secondary active px-4 rounded-pill" id="btn-all" onclick="setFilter('all', this)">TUDO</button>
+        <button class="btn btn-sm btn-outline-primary px-4 rounded-pill" onclick="setFilter('movie', this)">FILMES</button>
+        <button class="btn btn-sm btn-outline-success px-4 rounded-pill" onclick="setFilter('tv', this)">SÉRIES</button>
     </div>
 
     <div id="mainList" class="row justify-content-center"></div>
@@ -98,195 +109,186 @@
 
     window.onload = () => { render(); updateStats(); };
 
-    function saveData() { 
-        localStorage.setItem('myCineList', JSON.stringify(database)); 
-        updateStats(); 
+    function saveData() {
+        localStorage.setItem('myCineList', JSON.stringify(database));
+        updateStats();
     }
 
-    // --- CORREÇÃO DA PESQUISA ---
+    // --- ESTATÍSTICAS ---
+    function updateStats() {
+        const total = database.length;
+        const watching = database.filter(i => i.status === 'watching').length;
+        const toWatch = database.filter(i => i.status === 'planned').length;
+        const finished = database.filter(i => i.status === 'finished').length;
+
+        document.getElementById('statsPanel').innerHTML = `
+            <div class="col-6 col-md-3"><div class="stats-card text-center"><div class="stat-val">${total}</div><div class="stat-label">Total</div></div></div>
+            <div class="col-6 col-md-3"><div class="stats-card text-center text-info"><div class="stat-val">${watching}</div><div class="stat-label">A Ver</div></div></div>
+            <div class="col-6 col-md-3"><div class="stats-card text-center text-warning"><div class="stat-val">${toWatch}</div><div class="stat-label">Para Ver</div></div></div>
+            <div class="col-6 col-md-3"><div class="stats-card text-center text-success"><div class="stat-val">${finished}</div><div class="stat-label">Vistos</div></div></div>
+        `;
+    }
+
+    // --- LOGICA DE PESQUISA ---
     async function getSuggestions(query) {
         const div = document.getElementById('suggestions');
         if (query.length < 2) { div.style.display = 'none'; return; }
-        
-        try {
-            const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=pt-PT`);
-            const data = await res.json();
-            if (data.results && data.results.length > 0) {
-                div.innerHTML = data.results.slice(0, 8).map(item => {
-                    const title = item.title || item.name;
-                    const img = item.poster_path || item.profile_path;
-                    const year = (item.release_date || item.first_air_date || '').split('-')[0];
-                    return `
-                    <div class="suggestion-item" onclick="handleSelection(${item.id}, '${item.media_type}')">
-                        <img src="${img ? 'https://image.tmdb.org/t/p/w92'+img : 'https://via.placeholder.com/40x55'}">
-                        <div>
-                            <div class="fw-bold text-white">${title}</div>
-                            <div class="small text-muted">${item.media_type === 'person' ? '👤 Ator/Atriz' : '🎬 ' + year}</div>
-                        </div>
-                    </div>`;
-                }).join('');
-                div.style.display = 'block';
-            } else {
-                div.style.display = 'none';
-            }
-        } catch(e) { console.error("Erro na API"); }
-    }
-
-    async function handleSelection(id, type) {
-        document.getElementById('suggestions').style.display = 'none';
-        document.getElementById('movieInput').value = '';
-        
-        if(type === 'person') {
-            const res = await fetch(`https://api.themoviedb.org/3/person/${id}/combined_credits?api_key=${API_KEY}&language=pt-PT`);
-            const data = await res.json();
-            const top = data.cast.sort((a,b) => b.popularity - a.popularity).slice(0, 3);
-            for(let m of top) await addItem(m.id, m.media_type);
-        } else {
-            await addItem(id, type);
+        const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=pt-PT`);
+        const data = await res.json();
+        if (data.results?.length > 0) {
+            div.innerHTML = data.results.slice(0, 6).map(item => `
+                <div class="suggestion-item" onclick="selectItem(${item.id}, '${item.media_type}')">
+                    <img src="${item.poster_path ? 'https://image.tmdb.org/t/p/w92'+item.poster_path : 'https://via.placeholder.com/40x60'}">
+                    <div><div class="fw-bold text-white">${item.title || item.name}</div><div class="small text-muted">${(item.release_date || item.first_air_date || 'N/A').split('-')[0]}</div></div>
+                </div>`).join('');
+            div.style.display = 'block';
         }
     }
 
-    async function addItem(id, type) {
-        const mediaType = (type === 'tv' || type === 'movie') ? type : 'movie';
-        if (database.some(d => d.tmdbId === id)) return;
+    async function selectItem(id, type) {
+        document.getElementById('suggestions').style.display = 'none';
+        document.getElementById('movieInput').value = '';
+        const mediaType = type === 'tv' ? 'tv' : 'movie';
+        const res = await fetch(`https://api.themoviedb.org/3/${mediaType}/${id}?api_key=${API_KEY}&language=pt-PT`);
+        const item = await res.json();
 
-        try {
-            const res = await fetch(`https://api.themoviedb.org/3/${mediaType}/${id}?api_key=${API_KEY}&append_to_response=credits&language=pt-PT`);
-            const item = await res.json();
-
-            const entry = {
-                dbId: Date.now() + Math.random(),
-                tmdbId: item.id,
-                title: item.title || item.name,
-                type: mediaType,
-                year: (item.release_date || item.first_air_date || 'N/A').split('-')[0],
-                poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://via.placeholder.com/500x750',
-                backdrop: item.backdrop_path ? `https://image.tmdb.org/t/p/original${item.backdrop_path}` : '',
-                desc: item.overview || "Sem sinopse disponível.",
-                status: 'planned',
-                myRating: 0,
-                userComment: "",
-                cast: item.credits?.cast?.slice(0, 10).map(c => ({ id: c.id, name: c.name, img: c.profile_path })) || []
-            };
-
-            database.unshift(entry);
-            saveData();
-            render();
-        } catch(e) { console.error("Erro ao adicionar"); }
+        const entry = {
+            dbId: Date.now(),
+            title: item.title || item.name,
+            type: mediaType,
+            year: (item.release_date || item.first_air_date || 'N/A').split('-')[0],
+            poster: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
+            desc: item.overview || "Sem sinopse.",
+            myRating: 0,
+            status: 'planned', // Default: Para Ver
+            currentSeason: 1,  // Só para séries
+            currentEpisode: 1, // Só para séries
+            userComment: "",
+            tmdbRating: item.vote_average ? item.vote_average.toFixed(1) : "N/A"
+        };
+        database.unshift(entry);
+        saveData();
+        render();
     }
 
     function render() {
         const list = document.getElementById('mainList');
         const filtered = currentFilter === 'all' ? database : database.filter(i => i.type === currentFilter);
         
-        list.innerHTML = filtered.length === 0 ? '<div class="text-center text-muted mt-5">Nada por aqui. Pesquisa um filme ou ator!</div>' : 
-        filtered.map(item => `
-            <div class="col-12 col-lg-10">
+        list.innerHTML = filtered.map(item => {
+            let statusText = item.status === 'watching' ? 'A Ver' : item.status === 'finished' ? 'Visto' : 'Para Ver';
+            let statusClass = item.status === 'watching' ? 'bg-info' : item.status === 'finished' ? 'bg-success' : 'bg-warning text-dark';
+            
+            return `
+            <div class="col-12 col-lg-10 mb-2">
                 <div class="movie-card d-flex align-items-center" onclick="openDetails(${item.dbId})">
-                    <img src="${item.poster}" style="width:50px; height:70px; object-fit:cover; border-radius:6px;" class="me-3">
+                    <img src="${item.poster}" style="width:50px; height:75px; object-fit:cover; border-radius:8px;" class="me-3 shadow">
                     <div class="flex-grow-1">
-                        <h6 class="mb-0 fw-bold">${item.title} <span class="text-muted small">(${item.year})</span></h6>
-                        <div class="text-warning">${'★'.repeat(item.myRating)}${'☆'.repeat(5-item.myRating)}</div>
-                        <span class="badge ${item.status==='finished'?'bg-success':'bg-warning text-dark'}" style="font-size:0.6rem">${item.status.toUpperCase()}</span>
+                        <h6 class="mb-0">${item.title} <span class="text-muted small">(${item.year})</span></h6>
+                        <div class="star-rating">${'★'.repeat(item.myRating)}${'☆'.repeat(5-item.myRating)}</div>
+                        <span class="status-badge ${statusClass}">${statusText} ${item.type === 'tv' && item.status === 'watching' ? `(T${item.currentSeason} E${item.currentEpisode})` : ''}</span>
                     </div>
-                    <button class="btn text-danger p-2" onclick="event.stopPropagation(); remove(${item.dbId})">✕</button>
+                    <button class="btn text-danger border-0" onclick="event.stopPropagation(); remove(${item.dbId})">✕</button>
                 </div>
-            </div>`).join('');
+            </div>`;
+        }).join('');
     }
 
-    function openDetails(dbId) {
-        const item = database.find(i => i.dbId === dbId);
-        if(!item) return;
+    function openDetails(id) {
+        const item = database.find(i => i.dbId === id);
+        const modal = document.getElementById('modalContent');
+        modal.innerHTML = `
+            <div class="modal-body p-0">
+                <div class="row g-0">
+                    <div class="col-md-5 d-none d-md-block"><img src="${item.poster}" class="img-fluid h-100" style="object-fit:cover;"></div>
+                    <div class="col-md-7 p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="m-0">${item.title}</h4>
+                            <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
 
-        const modalDiv = document.getElementById('modalContent');
-        modalDiv.innerHTML = `
-            <div class="position-relative">
-                <img src="${item.backdrop}" class="modal-backdrop-img" onerror="this.style.display='none'">
-                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="p-4" style="margin-top: ${item.backdrop ? '-100px' : '0'}; position: relative;">
-                <div class="d-flex align-items-end gap-3 mb-4">
-                    <img src="${item.poster}" style="width:130px; border-radius:12px; border:3px solid #0b1120; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                    <div class="mb-2">
-                        <h3 class="fw-bold mb-1">${item.title}</h3>
-                        <select class="form-select form-select-sm bg-primary border-0 text-white fw-bold" onchange="updateField(${item.dbId}, 'status', this.value)">
-                            <option value="planned" ${item.status==='planned'?'selected':''}>⏳ PLANEADO</option>
-                            <option value="finished" ${item.status==='finished'?'selected':''}>✅ VISTO</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="synopsis-box mb-4">${item.desc}</div>
-                <h6 class="text-blue small fw-bold text-uppercase">Elenco Principal</h6>
-                <div class="cast-scroll mb-4">
-                    ${item.cast.map(c => `
-                        <div class="cast-item" onclick="handleSelection(${c.id}, 'person')" data-bs-dismiss="modal">
-                            <img src="${c.img ? 'https://image.tmdb.org/t/p/w185'+c.img : 'https://via.placeholder.com/100'}" class="cast-img">
-                            <span class="cast-name">${c.name}</span>
-                        </div>`).join('')}
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="small text-muted fw-bold">A MINHA NOTA:</label>
-                        <select class="form-select bg-dark text-warning border-secondary" onchange="updateField(${item.dbId}, 'myRating', this.value)">
-                            ${[0,1,2,3,4,5].map(v => `<option value="${v}" ${item.myRating == v ? 'selected' : ''}>${v} Estrelas</option>`).join('')}
-                        </select>
-                    </div>
-                    <div class="col-12">
-                        <label class="small text-muted fw-bold">O MEU COMENTÁRIO:</label>
-                        <textarea class="form-control bg-dark text-white border-secondary" rows="3" oninput="updateField(${item.dbId}, 'userComment', this.value)">${item.userComment || ''}</textarea>
+                        <div class="progression-box">
+                            <label class="small fw-bold text-blue d-block mb-2">ESTADO ATUAL:</label>
+                            <select class="form-select form-select-sm bg-dark text-white border-secondary mb-3" onchange="updateField(${item.dbId}, 'status', this.value); render(); openDetails(${item.dbId})">
+                                <option value="planned" ${item.status === 'planned' ? 'selected' : ''}>⏳ Para Ver</option>
+                                <option value="watching" ${item.status === 'watching' ? 'selected' : ''}>👀 A Ver Agora</option>
+                                <option value="finished" ${item.status === 'finished' ? 'selected' : ''}>✅ Já Vi Tudo</option>
+                            </select>
+
+                            ${item.type === 'tv' ? `
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label class="small text-muted">Temporada:</label>
+                                        <input type="number" class="form-control form-control-sm bg-dark text-white border-secondary" value="${item.currentSeason}" onchange="updateField(${item.dbId}, 'currentSeason', this.value)">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="small text-muted">Episódio:</label>
+                                        <input type="number" class="form-control form-control-sm bg-dark text-white border-secondary" value="${item.currentEpisode}" onchange="updateField(${item.dbId}, 'currentEpisode', this.value)">
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="small fw-bold text-warning d-block mb-1">A MINHA NOTA:</label>
+                            <select class="form-select form-select-sm bg-dark text-warning border-0" onchange="updateField(${item.dbId}, 'myRating', this.value); render()">
+                                ${[0,1,2,3,4,5].map(v => `<option value="${v}" ${item.myRating == v ? 'selected' : ''}>${v} Estrelas</option>`).join('')}
+                            </select>
+                        </div>
+
+                        <div class="synopsis-box">${item.desc}</div>
+
+                        <textarea class="comment-area" placeholder="Notas pessoais..." oninput="updateField(${item.dbId}, 'userComment', this.value)">${item.userComment || ''}</textarea>
                     </div>
                 </div>
             </div>`;
-        
         new bootstrap.Modal(document.getElementById('detailsModal')).show();
     }
 
     function updateField(id, field, value) {
         const item = database.find(i => i.dbId === id);
-        if(item) { 
-            item[field] = field === 'myRating' ? parseInt(value) : value; 
-            saveData(); 
-            render(); 
+        if(item) {
+            item[field] = (field === 'myRating' || field.includes('current')) ? parseInt(value) : value;
+            saveData();
         }
-    }
-
-    function updateStats() {
-        const stats = document.getElementById('statsPanel');
-        stats.innerHTML = `
-            <div class="col-4"><div class="p-2 text-center bg-dark rounded border border-secondary">
-                <div class="h5 m-0 text-blue">${database.length}</div><div class="small text-muted">Total</div>
-            </div></div>
-            <div class="col-4"><div class="p-2 text-center bg-dark rounded border border-secondary">
-                <div class="h5 m-0 text-success">${database.filter(i=>i.status==='finished').length}</div><div class="small text-muted">Vistos</div>
-            </div></div>
-            <div class="col-4"><div class="p-2 text-center bg-dark rounded border border-secondary">
-                <div class="h5 m-0 text-warning">${database.filter(i=>i.type==='tv').length}</div><div class="small text-muted">Séries</div>
-            </div></div>`;
-    }
-
-    function remove(id) {
-        const idx = database.findIndex(i => i.dbId === id);
-        historyStack.push(database[idx]);
-        database.splice(idx, 1);
-        saveData(); render();
-        document.getElementById('undoBanner').style.display = 'block';
-        setTimeout(() => document.getElementById('undoBanner').style.display = 'none', 6000);
-    }
-
-    function undoLastAction() {
-        if(historyStack.length) { database.unshift(historyStack.pop()); saveData(); render(); }
-        document.getElementById('undoBanner').style.display = 'none';
     }
 
     function setFilter(f, btn) {
         currentFilter = f;
         document.querySelectorAll('.btn-outline-primary, .btn-outline-success, .btn-outline-secondary').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active'); render();
+        btn.classList.add('active');
+        render();
     }
 
+    function remove(id) {
+        const idx = database.findIndex(i => i.dbId === id);
+        historyStack.push({type: 'DEL', data: database[idx]});
+        database.splice(idx, 1);
+        saveData();
+        render();
+        showUndo();
+    }
+
+    function undoLastAction() {
+        const last = historyStack.pop();
+        if(last.type === 'DEL') database.unshift(last.data);
+        saveData();
+        render();
+        document.getElementById('undoBanner').style.display = 'none';
+    }
+
+    function showUndo() {
+        const b = document.getElementById('undoBanner');
+        b.style.display = 'block';
+        setTimeout(() => b.style.display = 'none', 8000);
+    }
+
+    // Export/Import
     function exportData() {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(database));
-        const a = document.createElement('a'); a.setAttribute("href", dataStr); a.setAttribute("download", "backup.json"); a.click();
+        const a = document.createElement('a');
+        a.setAttribute("href", dataStr); a.setAttribute("download", "cinetrack_pro.json");
+        a.click();
     }
 
     function importData(e) {
