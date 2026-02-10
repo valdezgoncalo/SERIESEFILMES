@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineTrack Pro - Power Edition</title>
+    <title>CineTrack Pro - Folder Master</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root { 
@@ -13,83 +13,97 @@
 
         body { background-color: var(--bg-deep); color: var(--text-main); font-family: 'Inter', sans-serif; padding-bottom: 50px; }
 
-        /* ESTATÍSTICAS NO TOPO */
-        .stats-bar { background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 30px; display: flex; justify-content: space-around; text-align: center; }
-        .stat-val { display: block; font-size: 1.2rem; font-weight: 800; color: var(--accent); }
-        .stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
+        /* HEADER & STATS */
+        .stats-bar { background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 25px; display: flex; justify-content: space-around; }
+        .stat-val { display: block; font-size: 1.2rem; font-weight: 800; color: var(--accent); text-align: center;}
+        .stat-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-dim); }
 
-        /* PESQUISA E ORDENAÇÃO */
+        /* CONTROLS & FOLDERS */
         .search-box { position: relative; max-width: 650px; margin: 0 auto 15px; }
         .form-control-lg { background: #0f172a !important; border: 2px solid #334155 !important; color: white !important; border-radius: 15px; }
         #suggestions { position: absolute; width: 100%; background: #1e293b; border: 1px solid var(--accent); border-radius: 10px; display: none; z-index: 2000; margin-top: 5px; max-height: 300px; overflow-y: auto; }
+        
+        .controls-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 10px; }
+        .folder-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 25px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 15px; }
+        
+        .btn-tool { background: #1e293b; color: white; border: 1px solid #334155; border-radius: 10px; padding: 6px 15px; font-size: 0.85rem; transition: 0.3s; }
+        .btn-tool.active { background: var(--accent); color: #020617; font-weight: bold; }
 
-        .controls-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px; }
-        .btn-filter, .sort-select { background: #1e293b; color: white; border: 1px solid #334155; border-radius: 12px; padding: 8px 15px; font-size: 0.85rem; transition: 0.3s; }
-        .btn-filter.active { background: var(--accent); color: #020617; font-weight: bold; }
-        .sort-select { cursor: pointer; outline: none; }
+        /* BOTÃO DE PASTA COM DELETE */
+        .folder-group { display: flex; align-items: center; background: #1e293b; border-radius: 8px; border: 1px solid #334155; transition: 0.2s; }
+        .folder-group.active { border-color: var(--accent); background: rgba(56, 189, 248, 0.1); }
+        .btn-folder-name { background: transparent; color: var(--text-dim); border: none; padding: 4px 10px; font-size: 0.75rem; font-weight: 600; }
+        .folder-group.active .btn-folder-name { color: var(--accent); }
+        .btn-folder-del { background: transparent; border: none; color: #ef4444; padding: 0 8px; font-size: 0.7rem; opacity: 0.5; transition: 0.2s; border-left: 1px solid #334155; }
+        .btn-folder-del:hover { opacity: 1; background: rgba(239, 68, 68, 0.1); }
 
-        /* LISTA PRINCIPAL */
-        .m-card { background: var(--bg-card); border-radius: 16px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s ease; cursor: pointer; position: relative; }
-        .m-card:hover { border-color: var(--accent); transform: scale(1.01); }
-        .card-title { font-size: 1.15rem; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
+        /* LIST & GRID (MANTIDOS) */
+        #myList.grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 20px; }
+        .m-card { background: var(--bg-card); border-radius: 15px; padding: 12px; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s ease; cursor: pointer; display: flex; position: relative; }
+        .m-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+        .card-title { font-size: 1.1rem; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* MODAL E SAGA (MANTIDOS) */
-        .modal-content { background: #0f172a; border-radius: 24px; color: var(--text-main); border: 1px solid #334155; overflow: hidden; }
+        /* MODAL & SAGA (MANTIDOS) */
+        .modal-content { background: #0f172a; border-radius: 24px; border: 1px solid #334155; overflow: hidden; }
         .backdrop-img { width: 100%; height: 350px; object-fit: cover; mask-image: linear-gradient(to bottom, black 50%, transparent 100%); }
-        .modal-body { padding: 0 30px 30px; margin-top: -100px; }
-        .poster-main { width: 150px; border-radius: 18px; border: 4px solid #0f172a; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .modal-body { padding: 0 30px 30px; margin-top: -100px; position: relative; }
+        .poster-main { width: 140px; border-radius: 15px; border: 4px solid #0f172a; box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
+        .saga-list { display: flex; gap: 12px; overflow-x: auto; padding: 10px 0; }
+        .saga-item { flex: 0 0 90px; text-align: center; cursor: pointer; }
+        .saga-img { width: 90px; height: 130px; border-radius: 8px; object-fit: cover; }
 
-        .saga-list { display: flex; gap: 15px; overflow-x: auto; padding: 10px 0; }
-        .saga-item { flex: 0 0 100px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .saga-img { width: 100px; height: 140px; border-radius: 10px; object-fit: cover; }
-        .type-badge { background: rgba(56, 189, 248, 0.2); color: var(--accent); padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
-
-        /* HISTÓRICO (LADO DIREITO) */
-        .history-pane { background: rgba(15, 23, 42, 0.8); border-left: 1px solid #334155; height: 100vh; position: fixed; right: -300px; top: 0; width: 300px; z-index: 4000; transition: 0.4s; padding: 20px; backdrop-filter: blur(10px); }
+        /* HISTÓRICO & UTILS */
+        .history-pane { background: rgba(15, 23, 42, 0.9); border-left: 1px solid #334155; height: 100vh; position: fixed; right: -300px; top: 0; width: 300px; z-index: 4000; transition: 0.4s; padding: 20px; backdrop-filter: blur(10px); }
         .history-pane.open { right: 0; }
-        .history-item { font-size: 0.75rem; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-dim); }
-
-        #undoBanner { display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #020617; padding: 15px 30px; border-radius: 15px; font-weight: 800; z-index: 5000; }
+        .history-item { font-size: 0.7rem; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-dim); }
+        #undoBanner { display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #020617; padding: 12px 25px; border-radius: 15px; font-weight: 800; z-index: 5000; }
+        .type-badge { background: rgba(56, 189, 248, 0.2); color: var(--accent); padding: 2px 6px; border-radius: 5px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
+        .folder-badge { background: #334155; color: #94a3b8; padding: 2px 8px; border-radius: 4px; font-size: 0.6rem; margin-top: 4px; display: inline-block; }
     </style>
 </head>
 <body>
 
-<div id="undoBanner">REMOVIDO <button class="btn btn-sm btn-dark ms-3 rounded-pill fw-bold" onclick="undo()">DESFAZER</button></div>
+<div id="undoBanner">REMOVIDO <button class="btn btn-sm btn-dark ms-2 rounded-pill fw-bold" onclick="undo()">DESFAZER</button></div>
 
 <div class="history-pane shadow-lg" id="histPane">
-    <div class="d-flex justify-content-between mb-4">
-        <h5 class="m-0 fw-bold">Histórico</h5>
-        <button class="btn btn-sm btn-close btn-close-white" onclick="toggleHist()"></button>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="m-0 fw-bold">Atividade</h5>
+        <button class="btn-close btn-close-white" onclick="toggleHist()"></button>
     </div>
-    <div id="histContent"></div>
+    <div id="histContent" style="max-height: 85vh; overflow-y: auto;"></div>
 </div>
 
 <div class="container py-4">
     <header class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold m-0"><span style="color:var(--accent)">Cine</span>Track PRO</h2>
-        <div>
-            <button class="btn btn-sm btn-outline-info rounded-pill me-2" onclick="toggleHist()">Registo</button>
-            <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="exportJSON()">Backup</button>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-info rounded-pill" onclick="toggleHist()">Histórico</button>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="exportJSON()">Exportar</button>
+            <label class="btn btn-sm btn-outline-secondary rounded-pill m-0" for="importFile">Importar</label>
+            <input type="file" id="importFile" style="display:none" onchange="importJSON(this)">
         </div>
     </header>
 
     <div class="stats-bar" id="statsArea"></div>
 
     <div class="search-box">
-        <input type="text" id="term" class="form-control form-control-lg" placeholder="Adicionar novo filme/série..." onkeyup="search()">
+        <input type="text" id="term" class="form-control form-control-lg" placeholder="Adicionar Filme ou Série..." onkeyup="search()">
         <div id="suggestions"></div>
     </div>
 
     <div class="controls-row">
-        <button class="btn-filter active" id="btn-all" onclick="setFilter('all')">Tudo</button>
-        <button class="btn-filter" id="btn-movie" onclick="setFilter('movie')">Filmes</button>
-        <button class="btn-filter" id="btn-tv" onclick="setFilter('tv')">Séries</button>
-        <select class="sort-select" onchange="setSort(this.value)">
-            <option value="recent">Mais Recentes</option>
-            <option value="score">Melhor Nota (TMDB)</option>
-            <option value="alpha">Ordem Alfabética</option>
+        <button class="btn-tool active" id="btn-all" onclick="setFilter('all')">Tudo</button>
+        <button class="btn-tool" id="btn-movie" onclick="setFilter('movie')">Filmes</button>
+        <button class="btn-tool" id="btn-tv" onclick="setFilter('tv')">Séries</button>
+        <select class="btn-tool" onchange="setSort(this.value)">
+            <option value="recent">Recentes</option>
+            <option value="score">Melhor TMDB</option>
+            <option value="alpha">A-Z</option>
         </select>
+        <button class="btn-tool" id="toggleView" onclick="toggleView()">Visualização</button>
     </div>
+
+    <div class="folder-row" id="folderBar"></div>
 
     <div id="myList" class="row justify-content-center"></div>
 </div>
@@ -104,24 +118,27 @@
 
 <script>
     const KEY = '8661bff51991b4bcd2a9a9e9fa66b639';
-    let db = JSON.parse(localStorage.getItem('cine_v9_power')) || [];
-    let historyStack = []; // Para o Undo
-    let activityLog = JSON.parse(localStorage.getItem('cine_log')) || []; // Para o Histórico
+    let db = JSON.parse(localStorage.getItem('cine_ultimate_v12')) || [];
+    let folders = JSON.parse(localStorage.getItem('cine_folders_v12')) || ["Favoritos", "Maratona"];
+    let historyStack = [];
+    let activityLog = JSON.parse(localStorage.getItem('cine_log_v12')) || [];
     let currentFilter = 'all';
+    let currentFolderFilter = 'all';
     let currentSort = 'recent';
+    let isGridView = false;
 
     function logAction(msg) {
         const time = new Date().toLocaleTimeString();
         activityLog.unshift(`[${time}] ${msg}`);
-        if(activityLog.length > 20) activityLog.pop();
-        localStorage.setItem('cine_log', JSON.stringify(activityLog));
+        if(activityLog.length > 25) activityLog.pop();
+        localStorage.setItem('cine_log_v12', JSON.stringify(activityLog));
         renderHistory();
     }
 
     function save() { 
-        localStorage.setItem('cine_v9_power', JSON.stringify(db)); 
-        render(); 
-        renderStats();
+        localStorage.setItem('cine_ultimate_v12', JSON.stringify(db)); 
+        localStorage.setItem('cine_folders_v12', JSON.stringify(folders));
+        render(); renderStats(); renderFolderBar();
     }
 
     async function search() {
@@ -133,10 +150,7 @@
         box.innerHTML = d.results.filter(i => i.media_type !== 'person').slice(0,6).map(i => `
             <div class="p-3 border-bottom d-flex align-items-center" style="cursor:pointer" onclick="add(${i.id}, '${i.media_type}')">
                 <img src="https://image.tmdb.org/t/p/w92${i.poster_path}" style="width:35px; border-radius:4px; margin-right:15px">
-                <div class="flex-grow-1">
-                    <div class="fw-bold text-white">${i.title || i.name}</div>
-                    <div class="small text-info text-uppercase" style="font-size:0.7rem">${i.media_type}</div>
-                </div>
+                <div class="flex-grow-1"><div class="fw-bold text-white">${i.title || i.name}</div><div class="small text-info text-uppercase">${i.media_type}</div></div>
             </div>`).join('');
         box.style.display = 'block';
     }
@@ -147,29 +161,16 @@
         if(db.find(x => x.id === id)) return;
         const r = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${KEY}&append_to_response=recommendations&language=pt-PT`);
         const i = await r.json();
-
-        let related = [];
-        let relatedTitle = "Recomendações";
-        if(i.belongs_to_collection) {
-            const collRes = await fetch(`https://api.themoviedb.org/3/collection/${i.belongs_to_collection.id}?api_key=${KEY}&language=pt-PT`);
-            const collData = await collRes.json();
-            related = collData.parts.filter(p => p.id !== i.id).map(p => ({id: p.id, title: p.title, img: p.poster_path, type: 'movie'}));
-            relatedTitle = `Saga: ${i.belongs_to_collection.name}`;
-        } else {
-            related = i.recommendations?.results?.slice(0, 6).map(p => ({id: p.id, title: p.title || p.name, img: p.poster_path, type: type})) || [];
-        }
-
         db.unshift({
             id: i.id, type: type, title: i.title || i.name,
             img: i.poster_path ? `https://image.tmdb.org/t/p/w500${i.poster_path}` : 'https://via.placeholder.com/500x750',
             bg: i.backdrop_path ? `https://image.tmdb.org/t/p/original${i.backdrop_path}` : '',
             desc: i.overview || "Sem sinopse.",
             score: i.vote_average ? i.vote_average.toFixed(1) : '?',
-            genres: i.genres?.map(g => g.name).slice(0,2).join(' / '),
             date: (i.release_date || i.first_air_date || 'N/A'),
-            runtime: i.runtime || (i.episode_run_time ? i.episode_run_time[0] : '?'),
-            status: 'Para Ver', nota: 0,
-            related: related, relatedTitle: relatedTitle
+            status: 'Para Ver', nota: 0, folder: 'Nenhuma',
+            related: i.recommendations?.results?.slice(0, 8).map(p => ({id: p.id, title: p.title || p.name, img: p.poster_path, type: type})) || [],
+            relatedTitle: i.belongs_to_collection ? `Saga: ${i.belongs_to_collection.name}` : "Recomendações"
         });
         logAction(`Adicionado: ${i.title || i.name}`);
         save();
@@ -179,34 +180,60 @@
         const vistos = db.filter(i => i.status === 'Visto').length;
         const total = db.length;
         const media = db.filter(i => i.nota > 0).reduce((acc, curr) => acc + curr.nota, 0) / (db.filter(i => i.nota > 0).length || 1);
-        document.getElementById('statsArea').innerHTML = `
-            <div><span class="stat-val">${total}</span><span class="stat-label">Total</span></div>
-            <div><span class="stat-val">${vistos}</span><span class="stat-label">Vistos</span></div>
-            <div><span class="stat-val">${media.toFixed(1)}</span><span class="stat-label">Média ⭐</span></div>
-        `;
+        document.getElementById('statsArea').innerHTML = `<div><span class="stat-val">${total}</span><span class="stat-label">Total</span></div><div><span class="stat-val">${vistos}</span><span class="stat-label">Vistos</span></div><div><span class="stat-val">${media.toFixed(1)}</span><span class="stat-label">Média ⭐</span></div>`;
     }
 
-    function renderHistory() {
-        document.getElementById('histContent').innerHTML = activityLog.map(l => `<div class="history-item">${l}</div>`).join('');
+    function renderFolderBar() {
+        const bar = document.getElementById('folderBar');
+        let html = `<div class="folder-group ${currentFolderFilter === 'all' ? 'active' : ''}"><button class="btn-folder-name" onclick="setFolderFilter('all')">Tudo</button></div>`;
+        
+        folders.forEach(f => {
+            html += `
+            <div class="folder-group ${currentFolderFilter === f ? 'active' : ''}">
+                <button class="btn-folder-name" onclick="setFolderFilter('${f}')">${f}</button>
+                <button class="btn-folder-del" onclick="deleteFolder('${f}')">✕</button>
+            </div>`;
+        });
+
+        html += `<button class="btn-tool ms-2" style="border-style:dashed" onclick="newFolder()">+ Pasta</button>`;
+        bar.innerHTML = html;
+    }
+
+    function newFolder() {
+        const name = prompt("Nome da nova pasta:");
+        if(name && !folders.includes(name)) { folders.push(name); logAction(`Criada pasta: ${name}`); save(); }
+    }
+
+    function deleteFolder(name) {
+        if(confirm(`Eliminar a pasta "${name}"? Os filmes serão movidos para "Nenhuma".`)) {
+            db.forEach(i => { if(i.folder === name) i.folder = 'Nenhuma'; });
+            folders = folders.filter(f => f !== name);
+            if(currentFolderFilter === name) currentFolderFilter = 'all';
+            logAction(`Eliminada pasta: ${name}`);
+            save();
+        }
     }
 
     function render() {
-        let list = currentFilter === 'all' ? [...db] : db.filter(i => i.type === currentFilter);
-        
+        const container = document.getElementById('myList');
+        if(isGridView) container.classList.add('grid-view'); else container.classList.remove('grid-view');
+
+        let list = db;
+        if(currentFilter !== 'all') list = list.filter(i => i.type === currentFilter);
+        if(currentFolderFilter !== 'all') list = list.filter(i => i.folder === currentFolderFilter);
         if(currentSort === 'score') list.sort((a,b) => b.score - a.score);
         if(currentSort === 'alpha') list.sort((a,b) => a.title.localeCompare(b.title));
-        if(currentSort === 'recent') { /* já está por ordem de inserção */ }
 
-        document.getElementById('myList').innerHTML = list.map(i => `
-            <div class="col-12 col-md-10">
-                <div class="m-card d-flex align-items-center" onclick="openModal(${i.id})">
+        container.innerHTML = list.map(i => `
+            <div class="${isGridView ? '' : 'col-12 col-md-10 mb-2'}">
+                <div class="m-card" onclick="openModal(${i.id})">
                     <img src="${i.img}" style="width:60px; height:85px; object-fit:cover; border-radius:10px; margin-right:20px">
                     <div class="flex-grow-1 overflow-hidden">
                         <div class="card-title">${i.title}</div>
                         <div class="d-flex align-items-center gap-2 mt-1">
                             <span class="type-badge">${i.type === 'tv' ? 'Série' : 'Filme'}</span>
                             <span style="color:var(--tmdb-green); font-weight:bold;">⭐ ${i.score}</span>
-                            <span style="color:var(--accent); font-size:0.85rem;">• ${i.date.split('-')[0]}</span>
+                            ${i.folder !== 'Nenhuma' ? `<span class="folder-badge">${i.folder}</span>` : ''}
                         </div>
                     </div>
                     <button class="btn text-danger opacity-50" onclick="event.stopPropagation(); remove(${i.id})">✕</button>
@@ -214,88 +241,54 @@
             </div>`).join('');
     }
 
-    function remove(id) {
-        const idx = db.findIndex(x => x.id === id);
-        logAction(`Removido: ${db[idx].title}`);
-        historyStack.push(db[idx]);
-        db.splice(idx, 1);
-        save();
-        document.getElementById('undoBanner').style.display = 'block';
-        setTimeout(() => document.getElementById('undoBanner').style.display = 'none', 8000);
-    }
-
-    function undo() {
-        if(historyStack.length) {
-            const item = historyStack.pop();
-            db.unshift(item);
-            logAction(`Anulado: ${item.title} voltou à lista`);
-            save();
-        }
-        document.getElementById('undoBanner').style.display = 'none';
-    }
-
-    function setFilter(f) { 
-        currentFilter = f; 
-        document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-'+f).classList.add('active');
-        render(); 
-    }
-    
-    function setSort(s) { currentSort = s; render(); }
-    function toggleHist() { document.getElementById('histPane').classList.toggle('open'); }
-
     function openModal(id) {
         const i = db.find(x => x.id === id);
         const win = document.getElementById('winContent');
         win.innerHTML = `
-            <div class="position-relative">
-                <img src="${i.bg}" class="backdrop-img">
-                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4" data-bs-dismiss="modal"></button>
-            </div>
+            <div class="position-relative"><img src="${i.bg}" class="backdrop-img"><button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4" data-bs-dismiss="modal"></button></div>
             <div class="modal-body">
                 <div class="d-flex gap-4 align-items-end mb-4">
                     <img src="${i.img}" class="poster-main">
-                    <div>
-                        <h2 class="fw-bold text-white mb-2">${i.title}</h2>
-                        <div class="d-flex gap-2"><span class="type-badge">${i.type}</span><span class="badge bg-dark text-warning">⭐ TMDB ${i.score}</span></div>
-                    </div>
+                    <div><h2 class="fw-bold text-white mb-2">${i.title}</h2><div class="d-flex gap-2"><span class="type-badge">${i.type}</span><span class="badge bg-dark text-warning">⭐ ${i.score}</span></div></div>
                 </div>
                 <p style="color:#e2e8f0; font-size:0.9rem">${i.desc}</p>
-                ${i.related.length > 0 ? `
-                    <h6 class="fw-bold text-muted small text-uppercase mt-4 mb-3">${i.relatedTitle}</h6>
-                    <div class="saga-list">
-                        ${i.related.map(r => `<div class="saga-item" onclick="add(${r.id}, '${r.type}')" data-bs-dismiss="modal"><img src="https://image.tmdb.org/t/p/w185${r.img}" class="saga-img shadow-lg"><div style="font-size:0.6rem; margin-top:5px" class="text-truncate">${r.title}</div></div>`).join('')}
-                    </div>` : ''}
                 <div class="row g-2 mt-3 bg-dark p-3 rounded-4">
-                    <div class="col-6"><label class="small text-muted d-block mb-1 fw-bold">ESTADO</label>
-                        <select class="form-select bg-dark text-white border-0 fw-bold" onchange="update(${i.id}, 'status', this.value)">
-                            <option ${i.status === 'Para Ver' ? 'selected' : ''}>Para Ver</option>
-                            <option ${i.status === 'Visto' ? 'selected' : ''}>Visto</option>
+                    <div class="col-4"><label class="small text-muted d-block mb-1 fw-bold">ESTADO</label>
+                        <select class="form-select bg-dark text-white border-0 fw-bold p-0" onchange="update(${i.id}, 'status', this.value)">
+                            <option ${i.status === 'Para Ver' ? 'selected' : ''}>Para Ver</option><option ${i.status === 'Visto' ? 'selected' : ''}>Visto</option>
                         </select>
                     </div>
-                    <div class="col-6 border-start border-secondary text-center"><label class="small text-muted d-block mb-1 fw-bold">NOTA</label>
-                        <select class="form-select bg-dark text-warning border-0 text-center fw-bold" onchange="update(${i.id}, 'nota', this.value)">
-                            ${[0,1,2,3,4,5].map(n => `<option value="${n}" ${i.nota == n ? 'selected' : ''}>${n} ESTRELAS</option>`).join('')}
+                    <div class="col-4 border-start border-secondary"><label class="small text-muted d-block mb-1 fw-bold">NOTA</label>
+                        <select class="form-select bg-dark text-warning border-0 fw-bold p-0" onchange="update(${i.id}, 'nota', this.value)">
+                            ${[0,1,2,3,4,5].map(n => `<option value="${n}" ${i.nota == n ? 'selected' : ''}>${n} Estrelas</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="col-4 border-start border-secondary"><label class="small text-muted d-block mb-1 fw-bold">PASTA</label>
+                        <select class="form-select bg-dark text-info border-0 fw-bold p-0" onchange="update(${i.id}, 'folder', this.value)">
+                            <option value="Nenhuma">Nenhuma</option>
+                            ${folders.map(f => `<option value="${f}" ${i.folder === f ? 'selected' : ''}>${f}</option>`).join('')}
                         </select>
                     </div>
                 </div>
+                ${i.related.length > 0 ? `<h6 class="fw-bold text-muted small mt-4 mb-2 text-uppercase">${i.relatedTitle}</h6><div class="saga-list">${i.related.map(r => `<div class="saga-item" onclick="add(${r.id}, '${r.type}')" data-bs-dismiss="modal"><img src="https://image.tmdb.org/t/p/w185${r.img}" class="saga-img shadow-lg"><div style="font-size:0.6rem; margin-top:5px" class="text-truncate">${r.title}</div></div>`).join('')}</div>` : ''}
             </div>`;
         new bootstrap.Modal(document.getElementById('win')).show();
     }
 
-    function update(id, key, val) {
-        const i = db.find(x => x.id === id);
-        i[key] = key === 'nota' ? parseInt(val) : val;
-        logAction(`Editado: ${i.title} (${key} -> ${val})`);
-        save();
-    }
+    /* FUNÇÕES DE APOIO MANTIDAS */
+    function setFolderFilter(f) { currentFolderFilter = f; render(); renderFolderBar(); }
+    function setFilter(f) { currentFilter = f; document.querySelectorAll('.btn-tool').forEach(b => b.classList.remove('active')); document.getElementById('btn-'+f).classList.add('active'); render(); }
+    function setSort(s) { currentSort = s; render(); }
+    function toggleView() { isGridView = !isGridView; render(); }
+    function toggleHist() { document.getElementById('histPane').classList.toggle('open'); }
+    function renderHistory() { document.getElementById('histContent').innerHTML = activityLog.map(l => `<div class="history-item">${l}</div>`).join(''); }
+    function update(id, key, val) { const i = db.find(x => x.id === id); i[key] = key === 'nota' ? parseInt(val) : val; logAction(`Editado: ${i.title} (${key})`); save(); }
+    function remove(id) { const idx = db.findIndex(x => x.id === id); historyStack.push(db[idx]); logAction(`Removido: ${db[idx].title}`); db.splice(idx, 1); save(); document.getElementById('undoBanner').style.display = 'block'; setTimeout(() => document.getElementById('undoBanner').style.display = 'none', 8000); }
+    function undo() { if(historyStack.length) { const item = historyStack.pop(); db.unshift(item); logAction(`Restaurado: ${item.title}`); save(); } document.getElementById('undoBanner').style.display = 'none'; }
+    function exportJSON() { const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({db, folders})); const a = document.createElement('a'); a.href = data; a.download = "cinetrack_v12.json"; a.click(); }
+    function importJSON(input) { const reader = new FileReader(); reader.onload = (e) => { try { const data = JSON.parse(e.target.result); db = data.db || data; folders = data.folders || folders; save(); alert("Importado!"); } catch(err) { alert("Erro!"); } }; reader.readAsText(input.files[0]); }
 
-    function exportJSON() {
-        const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-        const a = document.createElement('a'); a.href = data; a.download = "cinetrack_full_v9.json"; a.click();
-    }
-
-    window.onload = () => { render(); renderStats(); renderHistory(); };
+    window.onload = () => { render(); renderStats(); renderHistory(); renderFolderBar(); };
 </script>
 </body>
 </html>
