@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineTrack Pro - Memória Permanente</title>
+    <title>CineTrack Pro - Ultimate Edition</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root { 
             --accent: #facc15; 
-            --bg: #0f172a; 
+            --bg: #0b0f1a; 
             --card: #1e293b; 
             --text-main: #ffffff; 
-            --text-dim: #cbd5e1; 
+            --text-dim: #94a3b8; 
             --blue: #38bdf8;
         }
 
@@ -19,82 +19,72 @@
             background-color: var(--bg); 
             color: var(--text-main); 
             font-family: 'Segoe UI', system-ui, sans-serif; 
-            padding-bottom: 100px;
+            padding-bottom: 50px;
         }
 
+        /* Stats Dashboard */
+        .stats-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid #334155; border-radius: 15px; padding: 20px; margin-bottom: 30px; }
+        .stat-val { font-size: 1.5rem; font-weight: bold; color: var(--blue); }
+        .stat-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Search & Suggest */
         .search-container { position: relative; max-width: 600px; margin: 0 auto; z-index: 1050; }
-        
         #suggestions { 
             position: absolute; top: 100%; left: 0; right: 0; 
             background: #1a202c; border: 1px solid #334155; 
             border-radius: 0 0 12px 12px; display: none;
             max-height: 400px; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
-
-        .suggestion-item { 
-            padding: 12px; cursor: pointer; border-bottom: 1px solid #334155; 
-            display: flex; align-items: center; transition: 0.2s;
-        }
+        .suggestion-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #334155; display: flex; align-items: center; }
         .suggestion-item:hover { background: #2d3748; }
         .suggestion-item img { width: 40px; height: 60px; margin-right: 15px; border-radius: 4px; object-fit: cover; }
 
-        .filter-btn { 
-            border: 1px solid #334155; color: var(--text-dim); 
-            padding: 8px 24px; border-radius: 30px; 
-            transition: 0.3s; background: transparent; font-weight: 500;
-        }
-        .filter-btn.active { background: var(--blue); border-color: var(--blue); color: white; }
-
-        .movie-card { 
-            background: var(--card); border-radius: 15px; border: 1px solid #334155; 
-            padding: 15px; margin-bottom: 15px; cursor: pointer; transition: 0.3s;
-        }
+        /* Cards */
+        .movie-card { background: var(--card); border-radius: 15px; border: 1px solid #334155; padding: 15px; margin-bottom: 15px; cursor: pointer; transition: 0.3s; }
         .movie-card:hover { border-color: var(--blue); transform: translateY(-2px); }
-        .star-rating { color: var(--accent); font-size: 1.2rem; }
+        .star-rating { color: var(--accent); font-size: 1.1rem; }
 
-        .modal-content { background-color: #161b22; border: 1px solid var(--blue); color: white; border-radius: 20px; overflow: hidden; }
-        .synopsis-box { 
-            background: rgba(255, 255, 255, 0.07); padding: 20px; 
-            border-radius: 12px; border-left: 4px solid var(--blue);
-            margin: 15px 0; color: #ffffff !important; font-size: 1rem; line-height: 1.6;
-        }
-        .saga-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 10px 0; }
-        .saga-img { width: 85px; height: 125px; object-fit: cover; border-radius: 8px; cursor: pointer; transition: 0.3s; border: 2px solid transparent; }
-        .saga-img:hover { transform: scale(1.1); border-color: var(--accent); }
+        /* Modal Details */
+        .modal-content { background-color: #0f172a; border: 1px solid var(--blue); color: white; border-radius: 20px; overflow: hidden; }
+        .synopsis-box { background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 10px; border-left: 3px solid var(--blue); margin-bottom: 20px; font-size: 0.95rem; line-height: 1.5; }
+        .comment-area { background: #1e293b; border: 1px solid #334155; color: white; border-radius: 10px; padding: 10px; font-size: 0.9rem; width: 100%; min-height: 80px; margin-top: 10px; }
 
-        #undoBanner { 
-            display: none; position: fixed; bottom: 30px; left: 50%; 
-            transform: translateX(-50%); z-index: 9999; 
-            background: var(--accent); color: #000; font-weight: bold;
-            padding: 15px 25px; border-radius: 50px;
-        }
+        /* Floating Undo */
+        #undoBanner { display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 9999; background: var(--accent); color: #000; font-weight: bold; padding: 12px 25px; border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.4); }
     </style>
 </head>
 <body>
 
-<div id="undoBanner" class="shadow-lg">
+<div id="undoBanner">
     Alteração registada! <button class="btn btn-sm btn-dark ms-3 rounded-pill" onclick="undoLastAction()">ANULAR</button>
 </div>
 
-<div class="container py-5">
-    <div class="text-center mb-5">
-        <h1 class="display-5 fw-bold text-white">🎬 CineTrack <span style="color:var(--blue)">Pro</span></h1>
-        <p class="text-muted">A tua biblioteca pessoal (com salvaguarda automática)</p>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold m-0">🎬 CineTrack <span style="color:var(--blue)">Pro</span></h2>
+        <div>
+            <button class="btn btn-sm btn-outline-light me-2" onclick="exportData()">Exportar Backup</button>
+            <button class="btn btn-sm btn-outline-info" onclick="document.getElementById('importFile').click()">Importar</button>
+            <input type="file" id="importFile" style="display:none" onchange="importData(event)">
+        </div>
     </div>
+
+    <div id="statsPanel" class="row g-3 mb-5">
+        </div>
 
     <div class="search-container mb-5">
         <div class="input-group input-group-lg shadow-sm">
             <span class="input-group-text bg-dark border-secondary text-muted">🔍</span>
             <input type="text" id="movieInput" class="form-control bg-dark text-white border-secondary" 
-                   placeholder="Pesquisar título..." oninput="getSuggestions(this.value)" autocomplete="off">
+                   placeholder="Pesquisar filme ou série..." oninput="getSuggestions(this.value)" autocomplete="off">
         </div>
         <div id="suggestions" class="shadow-lg"></div>
     </div>
 
-    <div class="d-flex justify-content-center gap-3 mb-5">
-        <button class="filter-btn active" onclick="setFilter('all', this)">TUDO</button>
-        <button class="filter-btn" onclick="setFilter('movie', this)">FILMES</button>
-        <button class="filter-btn" onclick="setFilter('tv', this)">SÉRIES</button>
+    <div class="d-flex justify-content-center gap-2 mb-4">
+        <button class="btn btn-sm btn-outline-secondary active px-4 rounded-pill" id="btn-all" onclick="setFilter('all', this)">TUDO</button>
+        <button class="btn btn-sm btn-outline-primary px-4 rounded-pill" onclick="setFilter('movie', this)">FILMES</button>
+        <button class="btn btn-sm btn-outline-success px-4 rounded-pill" onclick="setFilter('tv', this)">SÉRIES</button>
     </div>
 
     <div id="mainList" class="row justify-content-center"></div>
@@ -114,56 +104,101 @@
     let historyStack = [];
     let currentFilter = 'all';
 
-    // Iniciar a lista ao carregar a página
-    window.onload = () => render();
+    window.onload = () => { render(); updateStats(); };
 
     function saveData() {
         localStorage.setItem('myCineList', JSON.stringify(database));
+        updateStats();
     }
 
+    // --- 1. COMENTÁRIOS E NOTAS PESSOAIS ---
+    function updateComment(id, text) {
+        const item = database.find(i => i.dbId === id);
+        if(item) {
+            item.userComment = text;
+            saveData();
+        }
+    }
+
+    // --- 2. EXPORTAR / IMPORTAR (BACKUP) ---
+    function exportData() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(database));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "cinetrack_backup.json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
+    function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (Array.isArray(imported)) {
+                    database = imported;
+                    saveData();
+                    render();
+                    alert("Backup importado com sucesso!");
+                }
+            } catch (err) { alert("Erro ao ler ficheiro!"); }
+        };
+        reader.readAsText(file);
+    }
+
+    // --- 3. ESTATÍSTICAS ---
+    function updateStats() {
+        const total = database.length;
+        const movies = database.filter(i => i.type === 'movie').length;
+        const series = database.filter(i => i.type === 'tv').length;
+        const avgRating = total > 0 ? (database.reduce((acc, curr) => acc + (curr.myRating || 0), 0) / total).toFixed(1) : 0;
+
+        document.getElementById('statsPanel').innerHTML = `
+            <div class="col-6 col-md-3"><div class="stats-card text-center"><div class="stat-val">${total}</div><div class="stat-label">Total</div></div></div>
+            <div class="col-6 col-md-3"><div class="stats-card text-center"><div class="stat-val">${movies}</div><div class="stat-label">Filmes</div></div></div>
+            <div class="col-6 col-md-3"><div class="stats-card text-center"><div class="stat-val">${series}</div><div class="stat-label">Séries</div></div></div>
+            <div class="col-6 col-md-3"><div class="stats-card text-center"><div class="stat-val">${avgRating}⭐</div><div class="stat-label">Média Vossa</div></div></div>
+        `;
+    }
+
+    // API & SEARCH LOGIC
     async function getSuggestions(query) {
         const div = document.getElementById('suggestions');
         if (query.length < 2) { div.style.display = 'none'; return; }
-
-        try {
-            const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=pt-PT`);
-            const data = await res.json();
-            if (data.results?.length > 0) {
-                div.innerHTML = data.results.slice(0, 6).map(item => `
-                    <div class="suggestion-item" onclick="selectItem(${item.id}, '${item.media_type}')">
-                        <img src="${item.poster_path ? 'https://image.tmdb.org/t/p/w92'+item.poster_path : 'https://via.placeholder.com/40x60'}">
-                        <div>
-                            <div class="fw-bold text-white">${item.title || item.name}</div>
-                            <div class="small text-muted">${(item.release_date || item.first_air_date || 'N/A').split('-')[0]}</div>
-                        </div>
-                    </div>
-                `).join('');
-                div.style.display = 'block';
-            }
-        } catch (e) { console.error(e); }
+        const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=pt-PT`);
+        const data = await res.json();
+        if (data.results?.length > 0) {
+            div.innerHTML = data.results.slice(0, 6).map(item => `
+                <div class="suggestion-item" onclick="selectItem(${item.id}, '${item.media_type}')">
+                    <img src="${item.poster_path ? 'https://image.tmdb.org/t/p/w92'+item.poster_path : 'https://via.placeholder.com/40x60'}">
+                    <div><div class="fw-bold text-white">${item.title || item.name}</div><div class="small text-muted">${(item.release_date || item.first_air_date || 'N/A').split('-')[0]}</div></div>
+                </div>`).join('');
+            div.style.display = 'block';
+        }
     }
 
     async function selectItem(id, type) {
         document.getElementById('suggestions').style.display = 'none';
         document.getElementById('movieInput').value = '';
-        
         const mediaType = type === 'tv' ? 'tv' : 'movie';
         const res = await fetch(`https://api.themoviedb.org/3/${mediaType}/${id}?api_key=${API_KEY}&append_to_response=recommendations&language=pt-PT`);
         const item = await res.json();
 
         const entry = {
             dbId: Date.now(),
-            tmdbId: item.id,
             title: item.title || item.name,
             type: mediaType,
             year: (item.release_date || item.first_air_date || 'N/A').split('-')[0],
-            poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://via.placeholder.com/500x750',
-            desc: item.overview || "Sem sinopse disponível.",
+            poster: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
+            desc: item.overview || "Sem sinopse.",
             myRating: 0,
+            userComment: "",
             tmdbRating: item.vote_average ? item.vote_average.toFixed(1) : "N/A",
             related: item.recommendations?.results?.slice(0, 6) || []
         };
-
         database.unshift(entry);
         saveData();
         historyStack.push({type: 'ADD', data: entry});
@@ -174,56 +209,43 @@
     function render() {
         const list = document.getElementById('mainList');
         const filtered = currentFilter === 'all' ? database : database.filter(i => i.type === currentFilter);
-        
-        if (filtered.length === 0) {
-            list.innerHTML = `<div class="text-center text-muted mt-5">Lista vazia. Pesquisa algo para começar!</div>`;
-            return;
-        }
-
         list.innerHTML = filtered.map(item => `
-            <div class="col-12 col-lg-10">
+            <div class="col-12 col-lg-10 mb-2">
                 <div class="movie-card d-flex align-items-center" onclick="openDetails(${item.dbId})">
-                    <img src="${item.poster}" style="width:60px; height:90px; object-fit:cover; border-radius:8px;" class="me-4 shadow">
+                    <img src="${item.poster}" style="width:50px; height:75px; object-fit:cover; border-radius:8px;" class="me-3 shadow">
                     <div class="flex-grow-1">
-                        <h5 class="mb-1">${item.title} <span class="text-muted fw-normal small">(${item.year})</span></h5>
+                        <h6 class="mb-0">${item.title} <span class="text-muted small">(${item.year})</span></h6>
                         <div class="star-rating">${'★'.repeat(item.myRating)}${'☆'.repeat(5-item.myRating)}</div>
                     </div>
-                    <div class="text-end d-flex align-items-center">
-                        <span class="badge bg-dark border border-secondary me-3">${item.type.toUpperCase()}</span>
-                        <button class="btn btn-outline-danger border-0 rounded-circle" onclick="event.stopPropagation(); remove(${item.dbId})">✕</button>
-                    </div>
+                    <button class="btn text-danger border-0" onclick="event.stopPropagation(); remove(${item.dbId})">✕</button>
                 </div>
-            </div>
-        `).join('');
+            </div>`).join('');
     }
 
     function openDetails(id) {
         const item = database.find(i => i.dbId === id);
         const modal = document.getElementById('modalContent');
-        
         modal.innerHTML = `
             <div class="modal-body p-0">
                 <div class="row g-0">
-                    <div class="col-md-5"><img src="${item.poster}" class="img-fluid h-100 w-100" style="object-fit:cover;"></div>
-                    <div class="col-md-7 p-4 p-lg-5">
-                        <div class="d-flex justify-content-between mb-3">
-                            <h2 class="fw-bold mb-0">${item.title}</h2>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                        </div>
-                        <p class="text-warning fw-bold">⭐ Global: ${item.tmdbRating}</p>
-                        <div class="mb-4 bg-primary bg-opacity-10 p-3 rounded-4 border border-primary border-opacity-25">
-                            <label class="small fw-bold text-primary mb-2 d-block">A MINHA NOTA:</label>
-                            <select class="form-select bg-dark text-warning border-0 fw-bold" onchange="updateStar(${item.dbId}, this.value)">
-                                ${[0,1,2,3,4,5].map(v => `<option value="${v}" ${item.myRating == v ? 'selected' : ''}>${v} Estrelas ${'★'.repeat(v)}</option>`).join('')}
-                            </select>
-                        </div>
+                    <div class="col-md-5"><img src="${item.poster}" class="img-fluid h-100" style="object-fit:cover;"></div>
+                    <div class="col-md-7 p-4">
+                        <div class="d-flex justify-content-between"><h3>${item.title}</h3><button class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                        <p class="text-info fw-bold mb-3">⭐ TMDB: ${item.tmdbRating}</p>
+                        
+                        <label class="small fw-bold text-warning d-block mb-1">A MINHA NOTA:</label>
+                        <select class="form-select bg-dark text-warning border-0 mb-3" onchange="updateStar(${item.dbId}, this.value)">
+                            ${[0,1,2,3,4,5].map(v => `<option value="${v}" ${item.myRating == v ? 'selected' : ''}>${v} Estrelas</option>`).join('')}
+                        </select>
+
                         <div class="synopsis-box">${item.desc}</div>
-                        <h6 class="fw-bold text-uppercase small text-muted mt-4">Sagas / Relacionados</h6>
-                        <div class="saga-scroll">
-                            ${item.related.map(r => `
-                                <img src="https://image.tmdb.org/t/p/w200${r.poster_path}" class="saga-img shadow-sm" 
-                                     onclick="selectItem(${r.id}, '${r.media_type}')" data-bs-dismiss="modal">
-                            `).join('')}
+
+                        <label class="small fw-bold text-dim d-block mb-1">O MEU COMENTÁRIO:</label>
+                        <textarea class="comment-area" placeholder="Escreve aqui o que achaste..." oninput="updateComment(${item.dbId}, this.value)">${item.userComment || ''}</textarea>
+
+                        <h6 class="mt-4 small text-muted text-uppercase">Relacionados</h6>
+                        <div class="d-flex gap-2 overflow-auto py-2">
+                            ${item.related.map(r => `<img src="https://image.tmdb.org/t/p/w200${r.poster_path}" style="width:70px; border-radius:5px; cursor:pointer" onclick="selectItem(${r.id}, '${r.media_type}')" data-bs-dismiss="modal">`).join('')}
                         </div>
                     </div>
                 </div>
@@ -239,7 +261,7 @@
 
     function setFilter(f, btn) {
         currentFilter = f;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.btn-outline-primary, .btn-outline-success, .btn-outline-secondary').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         render();
     }
@@ -255,9 +277,8 @@
 
     function undoLastAction() {
         const last = historyStack.pop();
-        if (!last) return;
-        if (last.type === 'ADD') database.shift();
-        if (last.type === 'DEL') database.unshift(last.data);
+        if(last.type === 'ADD') database.shift();
+        else if(last.type === 'DEL') database.unshift(last.data);
         saveData();
         render();
         document.getElementById('undoBanner').style.display = 'none';
@@ -268,10 +289,6 @@
         b.style.display = 'block';
         setTimeout(() => b.style.display = 'none', 8000);
     }
-
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.search-container')) document.getElementById('suggestions').style.display = 'none';
-    });
 </script>
 </body>
 </html>
