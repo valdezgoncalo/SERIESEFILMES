@@ -3,58 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineTrack - SAGAS E FILTROS</title>
+    <title>CineTrack Pro - Memória Permanente</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root { --accent: #facc15; --bg: #0f172a; --card: #1e293b; }
-        body { background-color: var(--bg); color: white; font-family: sans-serif; }
-        
-        /* NOVO: Estilo dos Filtros */
-        .filter-bar { background: #1a202c; padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px solid #334155; }
-        .nav-pills .nav-link { color: #94a3b8; }
-        .nav-pills .nav-link.active { background-color: #38bdf8; color: white; }
+        :root { 
+            --accent: #facc15; 
+            --bg: #0f172a; 
+            --card: #1e293b; 
+            --text-main: #ffffff; 
+            --text-dim: #cbd5e1; 
+            --blue: #38bdf8;
+        }
 
-        /* Cartões com Estrelas */
-        .movie-card { background: var(--card); border-radius: 10px; border: 1px solid #334155; overflow: hidden; margin-bottom: 15px; transition: 0.3s; }
-        .movie-card:hover { border-color: #38bdf8; }
-        .star-rating { color: var(--accent); font-size: 1.1rem; }
+        body { 
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            padding-bottom: 100px;
+        }
+
+        .search-container { position: relative; max-width: 600px; margin: 0 auto; z-index: 1050; }
         
-        /* Secção de Sagas no Modal */
-        .saga-item { width: 90px; cursor: pointer; transition: 0.2s; border-radius: 5px; }
-        .saga-item:hover { transform: scale(1.1); border: 2px solid var(--accent); }
-        
-        #undoBanner { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; min-width: 300px; }
+        #suggestions { 
+            position: absolute; top: 100%; left: 0; right: 0; 
+            background: #1a202c; border: 1px solid #334155; 
+            border-radius: 0 0 12px 12px; display: none;
+            max-height: 400px; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .suggestion-item { 
+            padding: 12px; cursor: pointer; border-bottom: 1px solid #334155; 
+            display: flex; align-items: center; transition: 0.2s;
+        }
+        .suggestion-item:hover { background: #2d3748; }
+        .suggestion-item img { width: 40px; height: 60px; margin-right: 15px; border-radius: 4px; object-fit: cover; }
+
+        .filter-btn { 
+            border: 1px solid #334155; color: var(--text-dim); 
+            padding: 8px 24px; border-radius: 30px; 
+            transition: 0.3s; background: transparent; font-weight: 500;
+        }
+        .filter-btn.active { background: var(--blue); border-color: var(--blue); color: white; }
+
+        .movie-card { 
+            background: var(--card); border-radius: 15px; border: 1px solid #334155; 
+            padding: 15px; margin-bottom: 15px; cursor: pointer; transition: 0.3s;
+        }
+        .movie-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+        .star-rating { color: var(--accent); font-size: 1.2rem; }
+
+        .modal-content { background-color: #161b22; border: 1px solid var(--blue); color: white; border-radius: 20px; overflow: hidden; }
+        .synopsis-box { 
+            background: rgba(255, 255, 255, 0.07); padding: 20px; 
+            border-radius: 12px; border-left: 4px solid var(--blue);
+            margin: 15px 0; color: #ffffff !important; font-size: 1rem; line-height: 1.6;
+        }
+        .saga-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 10px 0; }
+        .saga-img { width: 85px; height: 125px; object-fit: cover; border-radius: 8px; cursor: pointer; transition: 0.3s; border: 2px solid transparent; }
+        .saga-img:hover { transform: scale(1.1); border-color: var(--accent); }
+
+        #undoBanner { 
+            display: none; position: fixed; bottom: 30px; left: 50%; 
+            transform: translateX(-50%); z-index: 9999; 
+            background: var(--accent); color: #000; font-weight: bold;
+            padding: 15px 25px; border-radius: 50px;
+        }
     </style>
 </head>
 <body>
 
-<div id="undoBanner" class="alert alert-warning shadow-lg text-center">
-    Ação registada! <button class="btn btn-sm btn-dark ms-2" onclick="undoLastAction()">ANULAR ERRO</button>
+<div id="undoBanner" class="shadow-lg">
+    Alteração registada! <button class="btn btn-sm btn-dark ms-3 rounded-pill" onclick="undoLastAction()">ANULAR</button>
 </div>
 
-<div class="container py-4">
-    <h2 class="text-center mb-4">🎬 My CineList</h2>
-
-    <div class="input-group input-group-lg mb-4 shadow">
-        <input type="text" id="movieInput" class="form-control bg-dark text-white border-secondary" placeholder="Pesquisar Predator, Matrix, etc...">
-        <button class="btn btn-primary" onclick="searchMedia()">ADICIONAR</button>
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold text-white">🎬 CineTrack <span style="color:var(--blue)">Pro</span></h1>
+        <p class="text-muted">A tua biblioteca pessoal (com salvaguarda automática)</p>
     </div>
 
-    <div class="filter-bar d-flex justify-content-center">
-        <ul class="nav nav-pills" id="filterGroup">
-            <li class="nav-item"><button class="nav-link active" onclick="setFilter('all', this)">TUDO</button></li>
-            <li class="nav-item"><button class="nav-link" onclick="setFilter('movie', this)">FILMES</button></li>
-            <li class="nav-item"><button class="nav-link" onclick="setFilter('tv', this)">SÉRIES</button></li>
-        </ul>
-    </div>
-
-    <div id="mainList" class="row">
+    <div class="search-container mb-5">
+        <div class="input-group input-group-lg shadow-sm">
+            <span class="input-group-text bg-dark border-secondary text-muted">🔍</span>
+            <input type="text" id="movieInput" class="form-control bg-dark text-white border-secondary" 
+                   placeholder="Pesquisar título..." oninput="getSuggestions(this.value)" autocomplete="off">
         </div>
+        <div id="suggestions" class="shadow-lg"></div>
+    </div>
+
+    <div class="d-flex justify-content-center gap-3 mb-5">
+        <button class="filter-btn active" onclick="setFilter('all', this)">TUDO</button>
+        <button class="filter-btn" onclick="setFilter('movie', this)">FILMES</button>
+        <button class="filter-btn" onclick="setFilter('tv', this)">SÉRIES</button>
+    </div>
+
+    <div id="mainList" class="row justify-content-center"></div>
 </div>
 
 <div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content bg-dark border-secondary" id="modalContent"></div>
+        <div class="modal-content" id="modalContent"></div>
     </div>
 </div>
 
@@ -62,88 +110,120 @@
 
 <script>
     const API_KEY = '8661bff51991b4bcd2a9a9e9fa66b639';
-    let database = [];
-    let history = [];
+    let database = JSON.parse(localStorage.getItem('myCineList')) || [];
+    let historyStack = [];
     let currentFilter = 'all';
 
-    async function searchMedia(title = null) {
-        const query = title || document.getElementById('movieInput').value;
-        if (!query) return;
+    // Iniciar a lista ao carregar a página
+    window.onload = () => render();
 
-        const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=pt-PT`);
-        const data = await res.json();
-        if (data.results?.length > 0) {
-            const item = data.results[0];
-            const type = item.media_type === 'tv' ? 'tv' : 'movie';
-            
-            // Busca detalhes, recomendações (SAGAS)
-            const detailsRes = await fetch(`https://api.themoviedb.org/3/${type}/${item.id}?api_key=${API_KEY}&append_to_response=recommendations&language=pt-PT`);
-            const details = await detailsRes.json();
+    function saveData() {
+        localStorage.setItem('myCineList', JSON.stringify(database));
+    }
 
-            const entry = {
-                dbId: Date.now(),
-                title: details.title || details.name,
-                type: type,
-                year: (details.release_date || details.first_air_date || '').split('-')[0],
-                poster: `https://image.tmdb.org/t/p/w500${details.poster_path}`,
-                desc: details.overview,
-                myRating: 0,
-                tmdbRating: details.vote_average.toFixed(1),
-                related: details.recommendations?.results?.slice(0, 5) || []
-            };
+    async function getSuggestions(query) {
+        const div = document.getElementById('suggestions');
+        if (query.length < 2) { div.style.display = 'none'; return; }
 
-            database.unshift(entry);
-            history.push({type: 'ADD', data: entry});
-            showUndo();
-            render();
-            document.getElementById('movieInput').value = '';
-        }
+        try {
+            const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=pt-PT`);
+            const data = await res.json();
+            if (data.results?.length > 0) {
+                div.innerHTML = data.results.slice(0, 6).map(item => `
+                    <div class="suggestion-item" onclick="selectItem(${item.id}, '${item.media_type}')">
+                        <img src="${item.poster_path ? 'https://image.tmdb.org/t/p/w92'+item.poster_path : 'https://via.placeholder.com/40x60'}">
+                        <div>
+                            <div class="fw-bold text-white">${item.title || item.name}</div>
+                            <div class="small text-muted">${(item.release_date || item.first_air_date || 'N/A').split('-')[0]}</div>
+                        </div>
+                    </div>
+                `).join('');
+                div.style.display = 'block';
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function selectItem(id, type) {
+        document.getElementById('suggestions').style.display = 'none';
+        document.getElementById('movieInput').value = '';
+        
+        const mediaType = type === 'tv' ? 'tv' : 'movie';
+        const res = await fetch(`https://api.themoviedb.org/3/${mediaType}/${id}?api_key=${API_KEY}&append_to_response=recommendations&language=pt-PT`);
+        const item = await res.json();
+
+        const entry = {
+            dbId: Date.now(),
+            tmdbId: item.id,
+            title: item.title || item.name,
+            type: mediaType,
+            year: (item.release_date || item.first_air_date || 'N/A').split('-')[0],
+            poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://via.placeholder.com/500x750',
+            desc: item.overview || "Sem sinopse disponível.",
+            myRating: 0,
+            tmdbRating: item.vote_average ? item.vote_average.toFixed(1) : "N/A",
+            related: item.recommendations?.results?.slice(0, 6) || []
+        };
+
+        database.unshift(entry);
+        saveData();
+        historyStack.push({type: 'ADD', data: entry});
+        showUndo();
+        render();
     }
 
     function render() {
         const list = document.getElementById('mainList');
-        list.innerHTML = '';
-        
         const filtered = currentFilter === 'all' ? database : database.filter(i => i.type === currentFilter);
+        
+        if (filtered.length === 0) {
+            list.innerHTML = `<div class="text-center text-muted mt-5">Lista vazia. Pesquisa algo para começar!</div>`;
+            return;
+        }
 
-        filtered.forEach(item => {
-            list.innerHTML += `
-                <div class="col-12 col-md-6 mb-3">
-                    <div class="movie-card d-flex align-items-center p-2" onclick="openDetails(${item.dbId})">
-                        <img src="${item.poster}" style="width:50px; border-radius:5px;" class="me-3">
-                        <div class="flex-grow-1">
-                            <h6 class="mb-0">${item.title} (${item.year})</h6>
-                            <div class="star-rating">${'★'.repeat(item.myRating)}${'☆'.repeat(5-item.myRating)}</div>
-                        </div>
-                        <button class="btn btn-sm btn-outline-danger border-0" onclick="event.stopPropagation(); remove(${item.dbId})">✕</button>
+        list.innerHTML = filtered.map(item => `
+            <div class="col-12 col-lg-10">
+                <div class="movie-card d-flex align-items-center" onclick="openDetails(${item.dbId})">
+                    <img src="${item.poster}" style="width:60px; height:90px; object-fit:cover; border-radius:8px;" class="me-4 shadow">
+                    <div class="flex-grow-1">
+                        <h5 class="mb-1">${item.title} <span class="text-muted fw-normal small">(${item.year})</span></h5>
+                        <div class="star-rating">${'★'.repeat(item.myRating)}${'☆'.repeat(5-item.myRating)}</div>
                     </div>
-                </div>`;
-        });
+                    <div class="text-end d-flex align-items-center">
+                        <span class="badge bg-dark border border-secondary me-3">${item.type.toUpperCase()}</span>
+                        <button class="btn btn-outline-danger border-0 rounded-circle" onclick="event.stopPropagation(); remove(${item.dbId})">✕</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
     }
 
     function openDetails(id) {
         const item = database.find(i => i.dbId === id);
         const modal = document.getElementById('modalContent');
+        
         modal.innerHTML = `
-            <div class="modal-body p-4">
-                <div class="row">
-                    <div class="col-md-4"><img src="${item.poster}" class="img-fluid rounded"></div>
-                    <div class="col-md-8">
-                        <h3>${item.title}</h3>
-                        <p class="text-info small">Rating Global: ⭐ ${item.tmdbRating}</p>
-                        
-                        <label class="small text-warning">A MINHA CLASSIFICAÇÃO:</label>
-                        <select class="form-select bg-dark text-white mb-3" onchange="updateStar(${item.dbId}, this.value)">
-                            ${[0,1,2,3,4,5].map(v => `<option value="${v}" ${item.myRating == v ? 'selected' : ''}>${v} Estrelas</option>`).join('')}
-                        </select>
-
-                        <h6>SINOPSE</h6>
-                        <p class="small text-muted">${item.desc || 'Sem descrição.'}</p>
-                        
-                        <hr>
-                        <h6>SAGAS / RELACIONADOS</h6>
-                        <div class="d-flex gap-2 overflow-auto py-2">
-                            ${item.related.map(r => `<img src="https://image.tmdb.org/t/p/w200${r.poster_path}" class="saga-item" onclick="searchMedia('${r.title || r.name}')" data-bs-dismiss="modal">`).join('')}
+            <div class="modal-body p-0">
+                <div class="row g-0">
+                    <div class="col-md-5"><img src="${item.poster}" class="img-fluid h-100 w-100" style="object-fit:cover;"></div>
+                    <div class="col-md-7 p-4 p-lg-5">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h2 class="fw-bold mb-0">${item.title}</h2>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <p class="text-warning fw-bold">⭐ Global: ${item.tmdbRating}</p>
+                        <div class="mb-4 bg-primary bg-opacity-10 p-3 rounded-4 border border-primary border-opacity-25">
+                            <label class="small fw-bold text-primary mb-2 d-block">A MINHA NOTA:</label>
+                            <select class="form-select bg-dark text-warning border-0 fw-bold" onchange="updateStar(${item.dbId}, this.value)">
+                                ${[0,1,2,3,4,5].map(v => `<option value="${v}" ${item.myRating == v ? 'selected' : ''}>${v} Estrelas ${'★'.repeat(v)}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="synopsis-box">${item.desc}</div>
+                        <h6 class="fw-bold text-uppercase small text-muted mt-4">Sagas / Relacionados</h6>
+                        <div class="saga-scroll">
+                            ${item.related.map(r => `
+                                <img src="https://image.tmdb.org/t/p/w200${r.poster_path}" class="saga-img shadow-sm" 
+                                     onclick="selectItem(${r.id}, '${r.media_type}')" data-bs-dismiss="modal">
+                            `).join('')}
                         </div>
                     </div>
                 </div>
@@ -152,30 +232,33 @@
     }
 
     function updateStar(id, val) {
-        const item = database.find(i => i.dbId === id);
-        item.myRating = parseInt(val);
+        database.find(i => i.dbId === id).myRating = parseInt(val);
+        saveData();
         render();
     }
 
     function setFilter(f, btn) {
         currentFilter = f;
-        document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         render();
     }
 
     function remove(id) {
         const idx = database.findIndex(i => i.dbId === id);
-        history.push({type: 'DEL', data: database[idx]});
+        historyStack.push({type: 'DEL', data: database[idx]});
         database.splice(idx, 1);
+        saveData();
         render();
         showUndo();
     }
 
     function undoLastAction() {
-        const last = history.pop();
+        const last = historyStack.pop();
+        if (!last) return;
         if (last.type === 'ADD') database.shift();
         if (last.type === 'DEL') database.unshift(last.data);
+        saveData();
         render();
         document.getElementById('undoBanner').style.display = 'none';
     }
@@ -183,8 +266,12 @@
     function showUndo() {
         const b = document.getElementById('undoBanner');
         b.style.display = 'block';
-        setTimeout(() => b.style.display = 'none', 6000);
+        setTimeout(() => b.style.display = 'none', 8000);
     }
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-container')) document.getElementById('suggestions').style.display = 'none';
+    });
 </script>
 </body>
 </html>
