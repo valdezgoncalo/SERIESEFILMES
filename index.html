@@ -3,77 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineTrack Pro - Filmes & Séries</title>
+    <title>CineTrack Pro - Sagas & MyRating</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root { --primary-blue: #38bdf8; --bg-dark: #0f172a; --card-bg: #1e293b; }
-        
         body { background-color: var(--bg-dark); color: #f8fafc; font-family: 'Segoe UI', sans-serif; padding-bottom: 50px; }
-        
-        .card { 
-            background-color: var(--card-bg); 
-            border: 1px solid #334155; 
-            color: white; 
-            transition: all 0.2s; 
-            cursor: pointer;
-        }
-        .card:hover { transform: translateY(-3px); border-color: var(--primary-blue); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
-        
-        .undo-banner { 
-            background-color: #fde047; color: #1e293b; 
-            display: none; position: fixed; top: 20px; right: 20px; 
-            z-index: 2000; border: none; font-weight: bold;
-        }
-
-        .poster-thumb { width: 70px; height: 100px; object-fit: cover; border-radius: 6px; }
-        .modal-content { background-color: var(--card-bg); color: white; border: 1px solid var(--primary-blue); }
-        .modal-header { border-bottom: 1px solid #334155; }
-        .synopsis { font-style: italic; color: #cbd5e1; line-height: 1.6; font-size: 0.95rem; }
-        
-        /* Ajustes para telemóvel */
-        @media (max-width: 576px) {
-            .navbar-brand { font-size: 1.2rem; }
-            .input-group-lg { scale: 0.9; }
-        }
+        .card { background-color: var(--card-bg); border: 1px solid #334155; color: white; cursor: pointer; transition: 0.2s; }
+        .card:hover { border-color: var(--primary-blue); transform: scale(1.02); }
+        .undo-banner { background-color: #fde047; color: #1e293b; display: none; position: fixed; top: 20px; right: 20px; z-index: 2000; font-weight: bold; }
+        .poster-thumb { width: 60px; height: 90px; object-fit: cover; border-radius: 4px; }
+        .related-poster { width: 80px; height: 120px; object-fit: cover; cursor: pointer; border-radius: 4px; transition: 0.2s; }
+        .related-poster:hover { transform: scale(1.1); border: 2px solid var(--primary-blue); }
+        .my-rating { color: #fde047; font-size: 1.2rem; }
+        .modal-content { background-color: var(--card-bg); border: 1px solid var(--primary-blue); }
     </style>
 </head>
 <body>
 
-<div id="undoBanner" class="alert undo-banner alert-dismissible fade show shadow" role="alert">
-    Ação registada! <button class="btn btn-sm btn-dark ms-2" onclick="undoLastAction()">Desfazer Erro</button>
+<div id="undoBanner" class="alert undo-banner shadow" role="alert">
+    Ação registada! <button class="btn btn-sm btn-dark ms-2" onclick="undoLastAction()">Desfazer</button>
 </div>
 
 <nav class="navbar navbar-dark bg-dark shadow mb-4">
     <div class="container">
-        <span class="navbar-brand h1 mb-0">🎬 CineTrack</span>
+        <span class="navbar-brand h1 mb-0">🎬 CineTrack <small style="font-size: 0.5em; color: var(--primary-blue);">SAGAS & RATINGS</small></span>
         <button class="btn btn-outline-info btn-sm" onclick="showHistoryLog()">Histórico</button>
     </div>
 </nav>
 
 <div class="container">
-    <div class="row mb-5">
-        <div class="col-md-8 mx-auto text-center">
-            <div class="input-group input-group-lg shadow">
-                <input type="text" id="movieInput" class="form-control bg-dark text-white border-secondary" placeholder="Nome do filme ou série...">
+    <div class="row mb-4">
+        <div class="col-md-8 mx-auto">
+            <div class="input-group shadow">
+                <input type="text" id="movieInput" class="form-control bg-dark text-white border-secondary" placeholder="Ex: Predator, Matrix, Breaking Bad...">
                 <button class="btn btn-primary" onclick="searchMedia()">Adicionar</button>
             </div>
-            <small class="text-muted mt-2 d-block">Dados automáticos via TMDB API</small>
         </div>
     </div>
 
+    <div class="d-flex justify-content-center gap-2 mb-4">
+        <button class="btn btn-sm btn-outline-secondary active" onclick="filterList('all', this)">Tudo</button>
+        <button class="btn btn-sm btn-outline-primary" onclick="filterList('movie', this)">🎥 Filmes</button>
+        <button class="btn btn-sm btn-outline-success" onclick="filterList('tv', this)">📺 Séries</button>
+    </div>
+
     <div class="row">
-        <div class="col-lg-9 mx-auto">
-            <h4 id="listTitle" class="mb-4 text-secondary">A Minha Lista</h4>
+        <div class="col-lg-8 mx-auto">
             <div id="mainList" class="row g-3">
-                <p class="text-center text-muted mt-5">A tua lista está vazia. Pesquisa algo acima!</p>
+                <p class="text-center text-muted mt-5">Pesquisa uma saga ou filme para começar...</p>
             </div>
         </div>
     </div>
 </div>
 
 <div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div id="modalContainer"></div>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div id="modalContainer" class="modal-content"></div>
     </div>
 </div>
 
@@ -83,87 +68,60 @@
     const API_KEY = '8661bff51991b4bcd2a9a9e9fa66b639';
     let database = [];
     let historyLog = [];
+    let currentFilter = 'all';
 
-    async function searchMedia() {
-        const query = document.getElementById('movieInput').value;
+    async function searchMedia(queryOverride = null) {
+        const query = queryOverride || document.getElementById('movieInput').value;
         if (!query) return;
 
         try {
             const response = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=pt-PT`);
             const data = await response.json();
-            
-            if (data.results && data.results.length > 0) {
+            if (data.results?.length > 0) {
                 const item = data.results[0];
                 const type = item.media_type === 'tv' ? 'tv' : 'movie';
-                
-                // Buscar detalhes profundos (Créditos, Descrição, Streaming)
-                const detailsResp = await fetch(`https://api.themoviedb.org/3/${type}/${item.id}?api_key=${API_KEY}&append_to_response=credits,watch/providers&language=pt-PT`);
-                const details = await detailsResp.json();
-
-                addToDatabase(details, type);
+                fetchFullDetails(item.id, type);
                 document.getElementById('movieInput').value = '';
-            } else {
-                alert("Nenhum resultado encontrado.");
             }
-        } catch (e) {
-            alert("Erro na ligação à API.");
-            console.error(e);
-        }
+        } catch (e) { alert("Erro na API."); }
     }
 
-    function addToDatabase(item, type) {
-        const director = type === 'movie' 
-            ? item.credits.crew.find(p => p.job === 'Director')?.name 
-            : (item.created_by?.[0]?.name || 'Vários');
-
+    async function fetchFullDetails(id, type) {
+        const resp = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${API_KEY}&append_to_response=credits,recommendations&language=pt-PT`);
+        const item = await resp.json();
+        
         const newItem = {
             dbId: Date.now(),
+            tmdbId: item.id,
             title: item.title || item.name,
-            year: (item.release_date || item.first_air_date || 'N/A').split('-')[0],
-            director: director,
-            cast: item.credits.cast.slice(0, 5).map(a => a.name).join(', '),
-            genres: item.genres.map(g => g.name),
-            description: item.overview || "Sem descrição disponível em português.",
-            poster: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://via.placeholder.com/200x300',
+            year: (item.release_date || item.first_air_date || '').split('-')[0],
+            description: item.overview,
+            poster: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
             type: type,
-            seasons: item.number_of_seasons || null,
-            rating: item.vote_average.toFixed(1)
+            myRating: 0,
+            tmdbRating: item.vote_average.toFixed(1),
+            recommendations: item.recommendations?.results?.slice(0, 4) || []
         };
 
-        database.unshift(newItem); // Adiciona ao início da lista
+        database.unshift(newItem);
         historyLog.push({ action: 'ADD', title: newItem.title, id: newItem.dbId, time: new Date().toLocaleTimeString() });
-        
         showUndoBanner();
         renderList();
     }
 
     function renderList() {
-        const listElement = document.getElementById('mainList');
-        if (database.length === 0) {
-            listElement.innerHTML = '<p class="text-center text-muted mt-5">A tua lista está vazia.</p>';
-            return;
-        }
-
-        listElement.innerHTML = database.map(item => `
-            <div class="col-12">
-                <div class="card p-3 shadow-sm" onclick="viewDetails(${item.dbId})">
-                    <div class="d-flex align-items-center">
-                        <img src="${item.poster}" class="poster-thumb me-3 shadow-sm">
-                        <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h5 class="mb-0">${item.title} <small class="text-muted">(${item.year})</small></h5>
-                                    <span class="badge ${item.type === 'movie' ? 'bg-primary' : 'bg-success'} mt-1">
-                                        ${item.type === 'movie' ? 'FILME' : 'SÉRIE'}
-                                    </span>
-                                    <span class="badge bg-dark border border-secondary text-warning ms-1">★ ${item.rating}</span>
-                                </div>
-                                <button class="btn btn-link text-danger p-0" onclick="event.stopPropagation(); removeItem(${item.dbId})">
-                                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
-                                </button>
-                            </div>
-                        </div>
+        const list = document.getElementById('mainList');
+        const filtered = currentFilter === 'all' ? database : database.filter(i => i.type === currentFilter);
+        
+        list.innerHTML = filtered.map(item => `
+            <div class="col-12 card p-2 mb-2" onclick="viewDetails(${item.dbId})">
+                <div class="d-flex align-items-center">
+                    <img src="${item.poster}" class="poster-thumb me-3">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0">${item.title} <small class="text-muted">(${item.year})</small></h6>
+                        <div class="my-rating">${'★'.repeat(item.myRating)}${'☆'.repeat(5 - item.myRating)}</div>
                     </div>
+                    <button class="btn btn-link text-danger" onclick="event.stopPropagation(); removeItem(${item.dbId})">×</button>
                 </div>
             </div>
         `).join('');
@@ -174,69 +132,68 @@
         const container = document.getElementById('modalContainer');
         
         container.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">${item.title}</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-5 mb-3 text-center">
-                            <img src="${item.poster}" class="img-fluid rounded shadow">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4"><img src="${item.poster}" class="img-fluid rounded shadow"></div>
+                    <div class="col-md-8">
+                        <h3>${item.title}</h3>
+                        <p class="small text-muted">Nota TMDB: ⭐ ${item.tmdbRating} | Tipo: ${item.type.toUpperCase()}</p>
+                        <div class="mb-3">
+                            <label class="d-block small">A Minha Classificação:</label>
+                            <select class="form-select form-select-sm bg-dark text-warning" onchange="updateRating(${item.dbId}, this.value)">
+                                ${[0,1,2,3,4,5].map(v => `<option value="${v}" ${item.myRating == v ? 'selected' : ''}>${v} Estrelas</option>`).join('')}
+                            </select>
                         </div>
-                        <div class="col-md-7">
-                            <h6>Sinopse</h6>
-                            <p class="synopsis mb-3">${item.description}</p>
-                            <p class="small mb-1"><strong>Realização:</strong> ${item.director}</p>
-                            <p class="small mb-1"><strong>Elenco:</strong> ${item.cast}</p>
-                            ${item.seasons ? `<p class="small mb-1 text-info"><strong>Temporadas:</strong> ${item.seasons}</p>` : ''}
-                            <div class="mt-3">
-                                ${item.genres.map(g => `<span class="badge bg-secondary me-1" style="font-size:0.7rem">${g}</span>`).join('')}
-                            </div>
+                        <h6>Sinopse</h6>
+                        <p style="font-size:0.9rem">${item.description || 'Sem descrição.'}</p>
+                        <hr class="border-secondary">
+                        <h6>Relacionados / Saga</h6>
+                        <div class="d-flex gap-2">
+                            ${item.recommendations.map(r => `
+                                <img src="https://image.tmdb.org/t/p/w200${r.poster_path}" class="related-poster" 
+                                     title="${r.title || r.name}" onclick="searchMedia('${r.title || r.name}')" data-bs-dismiss="modal">
+                            `).join('')}
                         </div>
                     </div>
                 </div>
             </div>
         `;
-        
         new bootstrap.Modal(document.getElementById('detailsModal')).show();
     }
 
+    function updateRating(dbId, val) {
+        const item = database.find(i => i.dbId === dbId);
+        item.myRating = parseInt(val);
+        renderList();
+    }
+
+    function filterList(type, btn) {
+        currentFilter = type;
+        document.querySelectorAll('.btn-outline-primary, .btn-outline-success, .btn-outline-secondary').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderList();
+    }
+
     function removeItem(id) {
-        const index = database.findIndex(i => i.dbId === id);
-        if (index > -1) {
-            historyLog.push({ action: 'DEL', title: database[index].title, id: id, data: database[index], time: new Date().toLocaleTimeString() });
-            database.splice(index, 1);
-            renderList();
-            showUndoBanner();
-        }
+        const idx = database.findIndex(i => i.dbId === id);
+        historyLog.push({ action: 'DEL', data: database[idx], time: new Date().toLocaleTimeString() });
+        database.splice(idx, 1);
+        renderList();
+        showUndoBanner();
     }
 
     function undoLastAction() {
         const last = historyLog.pop();
-        if (!last) return;
-
-        if (last.action === 'ADD') {
-            database = database.filter(i => i.dbId !== last.id);
-        } else if (last.action === 'DEL') {
-            database.unshift(last.data);
-        }
-        
+        if (last.action === 'ADD') database.shift();
+        else if (last.action === 'DEL') database.unshift(last.data);
         renderList();
         document.getElementById('undoBanner').style.display = 'none';
     }
 
     function showUndoBanner() {
-        const b = document.getElementById('undoBanner');
-        b.style.display = 'block';
-        setTimeout(() => b.style.display = 'none', 6000);
-    }
-
-    function showHistoryLog() {
-        const log = historyLog.map(h => `[${h.time}] ${h.action === 'ADD' ? 'Adicionado' : 'Removido'}: ${h.title}`).join('\n');
-        alert(log || "Sem histórico recente.");
+        document.getElementById('undoBanner').style.display = 'block';
+        setTimeout(() => document.getElementById('undoBanner').style.display = 'none', 5000);
     }
 </script>
-
 </body>
 </html>
