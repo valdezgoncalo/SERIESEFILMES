@@ -3,92 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineTrack Pro - Ultra Edition</title>
+    <title>CineTrack Pro - Power Edition</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root { 
-            --bg-deep: #020617; 
-            --bg-card: #1e293b; 
-            --accent: #38bdf8; 
-            --star: #fbbf24;
-            --text-main: #ffffff;
-            --text-dim: #cbd5e1;
-            --tmdb-green: #4ade80;
+            --bg-deep: #020617; --bg-card: #1e293b; --accent: #38bdf8; 
+            --star: #fbbf24; --text-main: #ffffff; --text-dim: #cbd5e1; --tmdb-green: #4ade80;
         }
 
-        body { 
-            background-color: var(--bg-deep); 
-            color: var(--text-main); 
-            font-family: 'Inter', sans-serif;
-            padding-bottom: 50px;
-        }
+        body { background-color: var(--bg-deep); color: var(--text-main); font-family: 'Inter', sans-serif; padding-bottom: 50px; }
 
-        /* PESQUISA E FILTROS */
-        .search-box { position: relative; max-width: 650px; margin: 0 auto 25px; }
-        .form-control-lg { 
-            background: #0f172a !important; 
-            border: 2px solid #334155 !important;
-            color: white !important;
-            border-radius: 15px;
-        }
-        #suggestions { 
-            position: absolute; width: 100%; background: #1e293b; 
-            border: 1px solid var(--accent); border-radius: 10px; 
-            display: none; z-index: 2000; margin-top: 5px; 
-        }
+        /* ESTATÍSTICAS NO TOPO */
+        .stats-bar { background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 30px; display: flex; justify-content: space-around; text-align: center; }
+        .stat-val { display: block; font-size: 1.2rem; font-weight: 800; color: var(--accent); }
+        .stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
 
-        .btn-filter { background: #1e293b; color: white; border: 1px solid #334155; border-radius: 12px; padding: 8px 24px; transition: 0.3s; }
+        /* PESQUISA E ORDENAÇÃO */
+        .search-box { position: relative; max-width: 650px; margin: 0 auto 15px; }
+        .form-control-lg { background: #0f172a !important; border: 2px solid #334155 !important; color: white !important; border-radius: 15px; }
+        #suggestions { position: absolute; width: 100%; background: #1e293b; border: 1px solid var(--accent); border-radius: 10px; display: none; z-index: 2000; margin-top: 5px; max-height: 300px; overflow-y: auto; }
+
+        .controls-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px; }
+        .btn-filter, .sort-select { background: #1e293b; color: white; border: 1px solid #334155; border-radius: 12px; padding: 8px 15px; font-size: 0.85rem; transition: 0.3s; }
         .btn-filter.active { background: var(--accent); color: #020617; font-weight: bold; }
+        .sort-select { cursor: pointer; outline: none; }
 
         /* LISTA PRINCIPAL */
-        .m-card { 
-            background: var(--bg-card); border-radius: 16px; padding: 16px; 
-            margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1);
-            transition: 0.2s ease; cursor: pointer;
-        }
+        .m-card { background: var(--bg-card); border-radius: 16px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s ease; cursor: pointer; position: relative; }
         .m-card:hover { border-color: var(--accent); transform: scale(1.01); }
-        .card-title { font-size: 1.15rem; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-title { font-size: 1.15rem; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
 
-        /* MODAL E SAGA */
+        /* MODAL E SAGA (MANTIDOS) */
         .modal-content { background: #0f172a; border-radius: 24px; color: var(--text-main); border: 1px solid #334155; overflow: hidden; }
         .backdrop-img { width: 100%; height: 350px; object-fit: cover; mask-image: linear-gradient(to bottom, black 50%, transparent 100%); }
         .modal-body { padding: 0 30px 30px; margin-top: -100px; }
         .poster-main { width: 150px; border-radius: 18px; border: 4px solid #0f172a; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
 
-        .saga-list { display: flex; gap: 15px; overflow-x: auto; padding: 10px 0; scrollbar-width: thin; }
-        .saga-item { flex: 0 0 110px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .saga-item:hover { transform: scale(1.1); }
-        .saga-img { width: 100px; height: 150px; border-radius: 10px; object-fit: cover; border: 2px solid transparent; }
-        .saga-item:hover .saga-img { border-color: var(--accent); }
-
+        .saga-list { display: flex; gap: 15px; overflow-x: auto; padding: 10px 0; }
+        .saga-item { flex: 0 0 100px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .saga-img { width: 100px; height: 140px; border-radius: 10px; object-fit: cover; }
         .type-badge { background: rgba(56, 189, 248, 0.2); color: var(--accent); padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
-        
-        #undoBanner { 
-            display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
-            background: var(--accent); color: #020617; padding: 15px 30px; border-radius: 15px;
-            font-weight: 800; z-index: 3000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+
+        /* HISTÓRICO (LADO DIREITO) */
+        .history-pane { background: rgba(15, 23, 42, 0.8); border-left: 1px solid #334155; height: 100vh; position: fixed; right: -300px; top: 0; width: 300px; z-index: 4000; transition: 0.4s; padding: 20px; backdrop-filter: blur(10px); }
+        .history-pane.open { right: 0; }
+        .history-item { font-size: 0.75rem; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-dim); }
+
+        #undoBanner { display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #020617; padding: 15px 30px; border-radius: 15px; font-weight: 800; z-index: 5000; }
     </style>
 </head>
 <body>
 
 <div id="undoBanner">REMOVIDO <button class="btn btn-sm btn-dark ms-3 rounded-pill fw-bold" onclick="undo()">DESFAZER</button></div>
 
+<div class="history-pane shadow-lg" id="histPane">
+    <div class="d-flex justify-content-between mb-4">
+        <h5 class="m-0 fw-bold">Histórico</h5>
+        <button class="btn btn-sm btn-close btn-close-white" onclick="toggleHist()"></button>
+    </div>
+    <div id="histContent"></div>
+</div>
+
 <div class="container py-4">
-    <header class="d-flex justify-content-between align-items-center mb-5">
+    <header class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold m-0"><span style="color:var(--accent)">Cine</span>Track PRO</h2>
-        <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="exportJSON()">Backup</button>
+        <div>
+            <button class="btn btn-sm btn-outline-info rounded-pill me-2" onclick="toggleHist()">Registo</button>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="exportJSON()">Backup</button>
+        </div>
     </header>
 
+    <div class="stats-bar" id="statsArea"></div>
+
     <div class="search-box">
-        <input type="text" id="term" class="form-control form-control-lg" placeholder="Pesquisar filmes ou séries no TMDB..." onkeyup="search()">
+        <input type="text" id="term" class="form-control form-control-lg" placeholder="Adicionar novo filme/série..." onkeyup="search()">
         <div id="suggestions"></div>
     </div>
 
-    <div class="d-flex justify-content-center gap-2 mb-4">
+    <div class="controls-row">
         <button class="btn-filter active" id="btn-all" onclick="setFilter('all')">Tudo</button>
         <button class="btn-filter" id="btn-movie" onclick="setFilter('movie')">Filmes</button>
         <button class="btn-filter" id="btn-tv" onclick="setFilter('tv')">Séries</button>
+        <select class="sort-select" onchange="setSort(this.value)">
+            <option value="recent">Mais Recentes</option>
+            <option value="score">Melhor Nota (TMDB)</option>
+            <option value="alpha">Ordem Alfabética</option>
+        </select>
     </div>
 
     <div id="myList" class="row justify-content-center"></div>
@@ -104,26 +104,38 @@
 
 <script>
     const KEY = '8661bff51991b4bcd2a9a9e9fa66b639';
-    let db = JSON.parse(localStorage.getItem('cine_v8_ultra')) || [];
-    let historyStack = [];
+    let db = JSON.parse(localStorage.getItem('cine_v9_power')) || [];
+    let historyStack = []; // Para o Undo
+    let activityLog = JSON.parse(localStorage.getItem('cine_log')) || []; // Para o Histórico
     let currentFilter = 'all';
+    let currentSort = 'recent';
 
-    function save() { localStorage.setItem('cine_v8_ultra', JSON.stringify(db)); render(); }
+    function logAction(msg) {
+        const time = new Date().toLocaleTimeString();
+        activityLog.unshift(`[${time}] ${msg}`);
+        if(activityLog.length > 20) activityLog.pop();
+        localStorage.setItem('cine_log', JSON.stringify(activityLog));
+        renderHistory();
+    }
+
+    function save() { 
+        localStorage.setItem('cine_v9_power', JSON.stringify(db)); 
+        render(); 
+        renderStats();
+    }
 
     async function search() {
         const q = document.getElementById('term').value;
         const box = document.getElementById('suggestions');
         if(q.length < 2) { box.style.display = 'none'; return; }
-
         const r = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEY}&query=${q}&language=pt-PT`);
         const d = await r.json();
-        
         box.innerHTML = d.results.filter(i => i.media_type !== 'person').slice(0,6).map(i => `
             <div class="p-3 border-bottom d-flex align-items-center" style="cursor:pointer" onclick="add(${i.id}, '${i.media_type}')">
                 <img src="https://image.tmdb.org/t/p/w92${i.poster_path}" style="width:35px; border-radius:4px; margin-right:15px">
                 <div class="flex-grow-1">
                     <div class="fw-bold text-white">${i.title || i.name}</div>
-                    <div class="small text-info text-uppercase" style="font-size:0.7rem">${i.media_type} • ${(i.release_date || i.first_air_date || '').split('-')[0]}</div>
+                    <div class="small text-info text-uppercase" style="font-size:0.7rem">${i.media_type}</div>
                 </div>
             </div>`).join('');
         box.style.display = 'block';
@@ -133,20 +145,18 @@
         document.getElementById('suggestions').style.display = 'none';
         document.getElementById('term').value = '';
         if(db.find(x => x.id === id)) return;
-
         const r = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${KEY}&append_to_response=recommendations&language=pt-PT`);
         const i = await r.json();
 
         let related = [];
         let relatedTitle = "Recomendações";
-
         if(i.belongs_to_collection) {
             const collRes = await fetch(`https://api.themoviedb.org/3/collection/${i.belongs_to_collection.id}?api_key=${KEY}&language=pt-PT`);
             const collData = await collRes.json();
             related = collData.parts.filter(p => p.id !== i.id).map(p => ({id: p.id, title: p.title, img: p.poster_path, type: 'movie'}));
             relatedTitle = `Saga: ${i.belongs_to_collection.name}`;
         } else {
-            related = i.recommendations?.results?.slice(0, 8).map(p => ({id: p.id, title: p.title || p.name, img: p.poster_path, type: type})) || [];
+            related = i.recommendations?.results?.slice(0, 6).map(p => ({id: p.id, title: p.title || p.name, img: p.poster_path, type: type})) || [];
         }
 
         db.unshift({
@@ -155,20 +165,39 @@
             bg: i.backdrop_path ? `https://image.tmdb.org/t/p/original${i.backdrop_path}` : '',
             desc: i.overview || "Sem sinopse.",
             score: i.vote_average ? i.vote_average.toFixed(1) : '?',
-            genres: i.genres?.map(g => g.name).join(' / ') || 'N/A',
+            genres: i.genres?.map(g => g.name).slice(0,2).join(' / '),
             date: (i.release_date || i.first_air_date || 'N/A'),
             runtime: i.runtime || (i.episode_run_time ? i.episode_run_time[0] : '?'),
             status: 'Para Ver', nota: 0,
             related: related, relatedTitle: relatedTitle
         });
+        logAction(`Adicionado: ${i.title || i.name}`);
         save();
     }
 
-    function render() {
-        const div = document.getElementById('myList');
-        const filtered = currentFilter === 'all' ? db : db.filter(i => i.type === currentFilter);
+    function renderStats() {
+        const vistos = db.filter(i => i.status === 'Visto').length;
+        const total = db.length;
+        const media = db.filter(i => i.nota > 0).reduce((acc, curr) => acc + curr.nota, 0) / (db.filter(i => i.nota > 0).length || 1);
+        document.getElementById('statsArea').innerHTML = `
+            <div><span class="stat-val">${total}</span><span class="stat-label">Total</span></div>
+            <div><span class="stat-val">${vistos}</span><span class="stat-label">Vistos</span></div>
+            <div><span class="stat-val">${media.toFixed(1)}</span><span class="stat-label">Média ⭐</span></div>
+        `;
+    }
 
-        div.innerHTML = filtered.map(i => `
+    function renderHistory() {
+        document.getElementById('histContent').innerHTML = activityLog.map(l => `<div class="history-item">${l}</div>`).join('');
+    }
+
+    function render() {
+        let list = currentFilter === 'all' ? [...db] : db.filter(i => i.type === currentFilter);
+        
+        if(currentSort === 'score') list.sort((a,b) => b.score - a.score);
+        if(currentSort === 'alpha') list.sort((a,b) => a.title.localeCompare(b.title));
+        if(currentSort === 'recent') { /* já está por ordem de inserção */ }
+
+        document.getElementById('myList').innerHTML = list.map(i => `
             <div class="col-12 col-md-10">
                 <div class="m-card d-flex align-items-center" onclick="openModal(${i.id})">
                     <img src="${i.img}" style="width:60px; height:85px; object-fit:cover; border-radius:10px; margin-right:20px">
@@ -176,14 +205,44 @@
                         <div class="card-title">${i.title}</div>
                         <div class="d-flex align-items-center gap-2 mt-1">
                             <span class="type-badge">${i.type === 'tv' ? 'Série' : 'Filme'}</span>
-                            <span style="color:var(--tmdb-green); font-weight:bold; font-size:0.9rem">⭐ ${i.score}</span>
-                            <span style="color:var(--accent); font-size:0.85rem; font-weight:600">• ${i.date.split('-')[0]}</span>
+                            <span style="color:var(--tmdb-green); font-weight:bold;">⭐ ${i.score}</span>
+                            <span style="color:var(--accent); font-size:0.85rem;">• ${i.date.split('-')[0]}</span>
                         </div>
                     </div>
                     <button class="btn text-danger opacity-50" onclick="event.stopPropagation(); remove(${i.id})">✕</button>
                 </div>
             </div>`).join('');
     }
+
+    function remove(id) {
+        const idx = db.findIndex(x => x.id === id);
+        logAction(`Removido: ${db[idx].title}`);
+        historyStack.push(db[idx]);
+        db.splice(idx, 1);
+        save();
+        document.getElementById('undoBanner').style.display = 'block';
+        setTimeout(() => document.getElementById('undoBanner').style.display = 'none', 8000);
+    }
+
+    function undo() {
+        if(historyStack.length) {
+            const item = historyStack.pop();
+            db.unshift(item);
+            logAction(`Anulado: ${item.title} voltou à lista`);
+            save();
+        }
+        document.getElementById('undoBanner').style.display = 'none';
+    }
+
+    function setFilter(f) { 
+        currentFilter = f; 
+        document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-'+f).classList.add('active');
+        render(); 
+    }
+    
+    function setSort(s) { currentSort = s; render(); }
+    function toggleHist() { document.getElementById('histPane').classList.toggle('open'); }
 
     function openModal(id) {
         const i = db.find(x => x.id === id);
@@ -196,40 +255,27 @@
             <div class="modal-body">
                 <div class="d-flex gap-4 align-items-end mb-4">
                     <img src="${i.img}" class="poster-main">
-                    <div class="flex-grow-1">
+                    <div>
                         <h2 class="fw-bold text-white mb-2">${i.title}</h2>
-                        <div class="d-flex gap-2 flex-wrap">
-                            <span class="type-badge">${i.type}</span>
-                            <span class="badge bg-dark text-warning">⭐ TMDB ${i.score}</span>
-                            <span class="badge bg-secondary">${i.runtime} MIN</span>
-                        </div>
+                        <div class="d-flex gap-2"><span class="type-badge">${i.type}</span><span class="badge bg-dark text-warning">⭐ TMDB ${i.score}</span></div>
                     </div>
                 </div>
-                <div class="mb-3"><small class="text-info fw-bold text-uppercase">${i.genres}</small></div>
-                <p style="color:#e2e8f0; line-height:1.7; font-size:0.95rem">${i.desc}</p>
-
+                <p style="color:#e2e8f0; font-size:0.9rem">${i.desc}</p>
                 ${i.related.length > 0 ? `
                     <h6 class="fw-bold text-muted small text-uppercase mt-4 mb-3">${i.relatedTitle}</h6>
-                    <div class="saga-list mb-4">
-                        ${i.related.map(r => `
-                            <div class="saga-item" onclick="add(${r.id}, '${r.type}')" data-bs-dismiss="modal">
-                                <img src="https://image.tmdb.org/t/p/w185${r.img}" class="saga-img shadow-lg">
-                                <div style="font-size:0.65rem; color:var(--text-dim); margin-top:8px" class="text-truncate">${r.title}</div>
-                            </div>`).join('')}
+                    <div class="saga-list">
+                        ${i.related.map(r => `<div class="saga-item" onclick="add(${r.id}, '${r.type}')" data-bs-dismiss="modal"><img src="https://image.tmdb.org/t/p/w185${r.img}" class="saga-img shadow-lg"><div style="font-size:0.6rem; margin-top:5px" class="text-truncate">${r.title}</div></div>`).join('')}
                     </div>` : ''}
-
-                <div class="row g-2 mt-2 bg-dark p-3 rounded-4">
-                    <div class="col-6">
-                        <label class="small text-muted d-block mb-1 fw-bold text-uppercase">Meu Estado</label>
+                <div class="row g-2 mt-3 bg-dark p-3 rounded-4">
+                    <div class="col-6"><label class="small text-muted d-block mb-1 fw-bold">ESTADO</label>
                         <select class="form-select bg-dark text-white border-0 fw-bold" onchange="update(${i.id}, 'status', this.value)">
                             <option ${i.status === 'Para Ver' ? 'selected' : ''}>Para Ver</option>
                             <option ${i.status === 'Visto' ? 'selected' : ''}>Visto</option>
                         </select>
                     </div>
-                    <div class="col-6 text-center border-start border-secondary">
-                        <label class="small text-muted d-block mb-1 fw-bold text-uppercase">Minha Nota</label>
+                    <div class="col-6 border-start border-secondary text-center"><label class="small text-muted d-block mb-1 fw-bold">NOTA</label>
                         <select class="form-select bg-dark text-warning border-0 text-center fw-bold" onchange="update(${i.id}, 'nota', this.value)">
-                            ${[0,1,2,3,4,5].map(n => `<option value="${n}" ${i.nota == n ? 'selected' : ''}>${n} Estrelas</option>`).join('')}
+                            ${[0,1,2,3,4,5].map(n => `<option value="${n}" ${i.nota == n ? 'selected' : ''}>${n} ESTRELAS</option>`).join('')}
                         </select>
                     </div>
                 </div>
@@ -237,39 +283,19 @@
         new bootstrap.Modal(document.getElementById('win')).show();
     }
 
-    function setFilter(f) {
-        currentFilter = f;
-        document.querySelectorAll('.btn-filter').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('btn-' + f).classList.add('active');
-        render();
-    }
-
-    function remove(id) {
-        const idx = db.findIndex(x => x.id === id);
-        historyStack.push(db[idx]);
-        db.splice(idx, 1);
-        save();
-        document.getElementById('undoBanner').style.display = 'block';
-        setTimeout(() => document.getElementById('undoBanner').style.display = 'none', 8000);
-    }
-
-    function undo() {
-        if(historyStack.length) { db.unshift(historyStack.pop()); save(); }
-        document.getElementById('undoBanner').style.display = 'none';
-    }
-
     function update(id, key, val) {
         const i = db.find(x => x.id === id);
         i[key] = key === 'nota' ? parseInt(val) : val;
+        logAction(`Editado: ${i.title} (${key} -> ${val})`);
         save();
     }
 
     function exportJSON() {
         const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-        const a = document.createElement('a'); a.href = data; a.download = "cinetrack_full_backup.json"; a.click();
+        const a = document.createElement('a'); a.href = data; a.download = "cinetrack_full_v9.json"; a.click();
     }
 
-    window.onload = render;
+    window.onload = () => { render(); renderStats(); renderHistory(); };
 </script>
 </body>
 </html>
