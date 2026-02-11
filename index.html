@@ -3,157 +3,417 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineTrack PRO - Gold Edition</title>
+    <title>CineTrack PRO - Gold Edition Enhanced</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { 
             --bg-body: #f1f5f9; 
             --bg-card: #ffffff; 
             --accent-gold: #f59e0b; 
+            --accent-gold-dark: #d97706;
             --text-dark: #0f172a; 
             --text-muted: #64748b; 
             --btn-dark: #1e293b;
+            --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1);
         }
+
+        * { box-sizing: border-box; }
 
         body { 
-            background-color: var(--bg-body); 
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
             color: var(--text-dark); 
             font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-            padding-bottom: 50px; 
+            padding-bottom: 60px;
+            min-height: 100vh;
         }
 
-        header h2 { color: var(--text-dark); font-weight: 800; }
-        .text-gold { color: var(--accent-gold) !important; }
+        header { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 20px; 
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 30px;
+        }
+        
+        header h2 { 
+            color: var(--text-dark); 
+            font-weight: 800; 
+            font-size: 2rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .text-gold { 
+            color: var(--accent-gold) !important; 
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+        }
+        
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .stats-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .stat-val {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--accent-gold-dark);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
 
         .search-section { 
             background: var(--bg-card); 
-            padding: 25px; 
+            padding: 30px; 
             border-radius: 20px; 
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); 
-            margin-bottom: 30px; 
+            box-shadow: var(--shadow-sm); 
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .search-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            display: block;
         }
         
         .form-control-custom { 
             background: #f8fafc !important; 
             border: 2px solid #e2e8f0 !important; 
             color: var(--text-dark) !important; 
-            border-radius: 12px; 
+            border-radius: 12px;
+            padding: 12px 20px !important;
+            font-size: 1rem !important;
+            transition: all 0.3s ease;
+            font-weight: 500;
         }
-        .form-control-custom:focus { border-color: var(--accent-gold) !important; box-shadow: none; }
-
-        .filter-group { background: #f8fafc; padding: 10px; border-radius: 15px; display: flex; gap: 8px; flex-wrap: wrap; }
         
-        .btn-gold { background: var(--accent-gold); color: white; font-weight: bold; border-radius: 10px; border: none; padding: 8px 20px; }
-        .btn-gold:hover { background: #d97706; color: white; }
+        .form-control-custom:focus { 
+            border-color: var(--accent-gold) !important; 
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1) !important;
+            background: white !important;
+        }
+
+        #suggestions { 
+            position: absolute; 
+            width: 100%; 
+            background: white; 
+            z-index: 2000; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+            border: 1px solid #e2e8f0;
+            display: none; 
+            margin-top: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .suggestion-item {
+            padding: 15px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .suggestion-item:hover {
+            background: linear-gradient(90deg, #fef3c7 0%, transparent 100%);
+        }
+
+        .filter-group { 
+            background: #f8fafc; 
+            padding: 12px; 
+            border-radius: 15px; 
+            display: flex; 
+            gap: 8px; 
+            flex-wrap: wrap;
+            border: 1px solid #e2e8f0;
+        }
         
         .btn-tool { 
             background: white; 
             color: var(--text-muted); 
-            border: 1px solid #e2e8f0; 
+            border: 2px solid #e2e8f0; 
             border-radius: 10px; 
-            padding: 6px 15px; 
+            padding: 8px 16px; 
             font-size: 0.85rem; 
-            font-weight: 600;
-            transition: 0.2s;
+            font-weight: 700;
+            transition: all 0.3s ease;
             cursor: pointer;
+            white-space: nowrap;
         }
+        
+        .btn-tool:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold-dark);
+            transform: translateY(-2px);
+        }
+        
         .btn-tool.active { 
-            background: var(--accent-gold); 
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark));
             color: white; 
-            border-color: var(--accent-gold); 
+            border-color: var(--accent-gold);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
         }
 
-        #myList.grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+        .btn-gold { 
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark));
+            color: white; 
+            font-weight: 700; 
+            border-radius: 12px; 
+            border: none; 
+            padding: 10px 24px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            font-size: 0.9rem;
+        }
+        
+        .btn-gold:hover { 
+            background: linear-gradient(135deg, var(--accent-gold-dark), #b45309);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+        }
+
+        .scroll-row { 
+            display: flex; 
+            gap: 10px; 
+            overflow-x: auto; 
+            padding: 12px 0; 
+        }
+        
+        .scroll-row::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .scroll-row::-webkit-scrollbar-thumb {
+            background: var(--accent-gold);
+            border-radius: 10px;
+        }
+
+        #myList.grid-view { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); 
+            gap: 25px;
+        }
         
         .m-card { 
             background: var(--bg-card); 
             border-radius: 18px; 
-            padding: 12px; 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); 
-            border: 1px solid #f1f5f9;
-            transition: 0.2s ease-in-out;
+            padding: 15px; 
+            box-shadow: var(--shadow-sm);
+            border: 2px solid #f1f5f9;
+            transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
         }
-        .m-card:hover { transform: translateY(-5px); border-color: var(--accent-gold); box-shadow: 0 15px 20px rgba(0,0,0,0.1); }
-        .m-card:active { transform: scale(0.97); }
-        .m-card img { width: 100%; height: 210px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; pointer-events: none; }
-        .m-card .card-info { pointer-events: none; }
-
-        .modal-content { border-radius: 28px; border: none; overflow: hidden; background: white; }
-        .modal-header-img { width: 100%; height: 220px; object-fit: cover; }
-        .btn-youtube { background: #ff0000; color: white; font-weight: bold; border-radius: 8px; text-decoration: none; padding: 5px 12px; font-size: 0.8rem; }
-        .folder-check-list { max-height: 140px; overflow-y: auto; background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px solid #e2e8f0; }
-
-        .scroll-row { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
-        #undoBanner { 
-            display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
-            background: var(--btn-dark); color: white; padding: 15px 30px; border-radius: 50px; 
-            z-index: 9999; box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
+        
+        .m-card:hover { 
+            transform: translateY(-10px); 
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent-gold);
         }
         
-        #suggestions { 
-            position: absolute; width: 100%; background: white; z-index: 2000; 
-            border-radius: 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;
-            display: none; margin-top: 5px; max-height: 300px; overflow-y: auto;
+        .m-card img {
+            width: 100%; 
+            height: 230px; 
+            object-fit: cover; 
+            border-radius: 12px; 
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .card-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            min-height: 2.6em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .modal-content { 
+            border-radius: 28px; 
+            border: none; 
+            overflow: hidden; 
+            background: white;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+        }
+        
+        .modal-header-img { 
+            width: 100%; 
+            height: 280px; 
+            object-fit: cover;
+        }
+
+        .btn-youtube { 
+            background: #ff0000; 
+            color: white; 
+            font-weight: 700; 
+            border-radius: 10px; 
+            text-decoration: none; 
+            padding: 8px 16px; 
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-youtube:hover {
+            background: #cc0000;
+            color: white;
+        }
+
+        #undoBanner { 
+            display: none; 
+            position: fixed; 
+            bottom: 30px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: var(--btn-dark);
+            color: white; 
+            padding: 18px 35px; 
+            border-radius: 50px; 
+            z-index: 9999; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 768px) {
+            #myList.grid-view {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
         }
     </style>
 </head>
 <body>
 
 <div id="undoBanner">
-    🗑️ Item removido <button class="btn btn-sm btn-warning ms-3 fw-bold rounded-pill" onclick="undo()">DESFAZER</button>
+    🗑️ <strong>Item removido</strong> 
+    <button class="btn btn-sm btn-warning ms-3 fw-bold rounded-pill" onclick="undo()">DESFAZER</button>
 </div>
 
-<div class="container py-5">
-    <header class="d-flex justify-content-between align-items-center mb-5">
-        <h2 class="m-0">CineTrack <span class="text-gold">PRO</span></h2>
-        <button class="btn btn-sm btn-outline-dark rounded-pill px-3" onclick="exportJSON()">Backup JSON</button>
+<div class="container py-4">
+    <header>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <h2>
+                <span class="header-icon">🎬</span>
+                CineTrack <span class="text-gold">PRO</span>
+            </h2>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-bold" onclick="exportJSON()">💾 Exportar</button>
+                <label class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-bold m-0" for="importFile" style="cursor: pointer;">📂 Importar</label>
+                <input type="file" id="importFile" style="display:none" accept=".json" onchange="importJSON(this)">
+            </div>
+        </div>
     </header>
 
+    <div class="stats-bar" id="statsArea"></div>
+
     <div class="search-section">
-        <div class="row g-3">
-            <div class="col-md-8 position-relative">
-                <label class="small fw-bold text-muted mb-1">ADICIONAR NOVO</label>
-                <input type="text" id="term" class="form-control form-control-lg form-control-custom" placeholder="Pesquisar na Cloud..." onkeyup="searchGlobal()">
+        <div class="row g-3 mb-4">
+            <div class="col-md-7 position-relative">
+                <label class="search-label">🔍 Adicionar Novo Conteúdo</label>
+                <input type="text" id="term" class="form-control form-control-lg form-control-custom" 
+                       placeholder="Pesquisar filmes e séries..." 
+                       onkeyup="searchGlobal()">
                 <div id="suggestions"></div>
             </div>
-            <div class="col-md-4">
-                <label class="small fw-bold text-muted mb-1">FILTRAR NA MINHA LISTA</label>
-                <input type="text" id="localSearch" class="form-control form-control-lg form-control-custom" placeholder="Procurar por nome..." onkeyup="render()">
+            <div class="col-md-5">
+                <label class="search-label">🔎 Filtrar Na Minha Lista</label>
+                <input type="text" id="localSearch" class="form-control form-control-lg form-control-custom" 
+                       placeholder="Procurar por título..." 
+                       onkeyup="render()">
             </div>
         </div>
 
-        <div class="mt-4 d-flex flex-wrap gap-3 align-items-center">
+        <div class="d-flex flex-wrap gap-3 align-items-center mb-3">
             <div class="filter-group">
-                <button class="btn-tool active" onclick="setFilter('type', 'all', this)">Tudo</button>
-                <button class="btn-tool" onclick="setFilter('type', 'movie', this)">Filmes</button>
-                <button class="btn-tool" onclick="setFilter('type', 'tv', this)">Séries</button>
+                <button class="btn-tool active" data-type="all" onclick="setFilter('type', 'all', this)">📁 Tudo</button>
+                <button class="btn-tool" data-type="movie" onclick="setFilter('type', 'movie', this)">🎬 Filmes</button>
+                <button class="btn-tool" data-type="tv" onclick="setFilter('type', 'tv', this)">📺 Séries</button>
             </div>
             <div class="filter-group">
-                <button class="btn-tool active" onclick="setFilter('status', 'all', this)">Todos Status</button>
-                <button class="btn-tool" onclick="setFilter('status', 'Para Ver', this)">Para Ver</button>
-                <button class="btn-tool" onclick="setFilter('status', 'A Ver', this)">A Ver</button>
-                <button class="btn-tool" onclick="setFilter('status', 'Visto', this)">Vistos</button>
+                <button class="btn-tool active" data-status="all" onclick="setFilter('status', 'all', this)">Todos</button>
+                <button class="btn-tool" data-status="Para Ver" onclick="setFilter('status', 'Para Ver', this)">📌 Para Ver</button>
+                <button class="btn-tool" data-status="A Ver" onclick="setFilter('status', 'A Ver', this)">▶️ A Ver</button>
+                <button class="btn-tool" data-status="Visto" onclick="setFilter('status', 'Visto', this)">✅ Vistos</button>
             </div>
-            <button class="btn btn-gold" onclick="pickRandom()">🎲 ALEATÓRIO</button>
+            <button class="btn btn-gold" onclick="pickRandom()">🎲 Escolha Aleatória</button>
         </div>
 
-        <div class="scroll-row mt-3" id="folderBar"></div>
+        <div class="scroll-row" id="folderBar"></div>
         <div class="scroll-row" id="genreBar"></div>
     </div>
 
     <div id="myList" class="grid-view"></div>
 </div>
 
-<div class="modal fade" id="win" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content" id="winContent"></div></div></div>
+<div class="modal fade" id="win" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" id="winContent"></div>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
     const KEY = '8661bff51991b4bcd2a9a9e9fa66b639';
-    const DB_NAME = 'cinetrack_production_v2'; // Nova versão para suportar multi-pastas
-    const FL_NAME = 'cinetrack_folders_v1';
+    const DB_NAME = 'cinetrack_production_v2';
+    const FL_NAME = 'cinetrack_folders_v2';
 
     let db = JSON.parse(localStorage.getItem(DB_NAME)) || [];
     let folders = JSON.parse(localStorage.getItem(FL_NAME)) || ["Favoritos"];
@@ -163,7 +423,33 @@
     function save() { 
         localStorage.setItem(DB_NAME, JSON.stringify(db)); 
         localStorage.setItem(FL_NAME, JSON.stringify(folders));
-        render(); renderFolderBar(); renderGenreBar();
+        render(); renderStats(); renderFolderBar(); renderGenreBar();
+    }
+
+    function renderStats() {
+        const total = db.length;
+        const vistos = db.filter(i => i.status === 'Visto').length;
+        const aVer = db.filter(i => i.status === 'A Ver').length;
+        const paraVer = db.filter(i => i.status === 'Para Ver').length;
+        
+        document.getElementById('statsArea').innerHTML = `
+            <div class="stat-item">
+                <span class="stat-val">${total}</span>
+                <span class="stat-label">📚 Total</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val">${vistos}</span>
+                <span class="stat-label">✅ Vistos</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val">${aVer}</span>
+                <span class="stat-label">▶️ A Ver</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val">${paraVer}</span>
+                <span class="stat-label">📌 Para Ver</span>
+            </div>
+        `;
     }
 
     async function searchGlobal() {
@@ -173,8 +459,8 @@
         const r = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEY}&query=${q}&language=pt-PT`);
         const d = await r.json();
         box.innerHTML = d.results.filter(i => i.media_type !== 'person').slice(0,5).map(i => `
-            <div class="p-3 border-bottom d-flex align-items-center" style="cursor:pointer" onclick="add(${i.id}, '${i.media_type}')">
-                <img src="https://image.tmdb.org/t/p/w92${i.poster_path}" style="width:35px; border-radius:6px; margin-right:15px">
+            <div class="suggestion-item" onclick="add(${i.id}, '${i.media_type}')">
+                <img src="https://image.tmdb.org/t/p/w92${i.poster_path}" style="width:35px; border-radius:6px;">
                 <div class="fw-bold text-dark">${i.title || i.name}</div>
             </div>`).join('');
         box.style.display = 'block';
@@ -188,12 +474,12 @@
         if(db.some(x => x.id === i.id)) return;
         db.unshift({
             id: i.id, type: type, title: i.title || i.name,
-            img: i.poster_path ? `https://image.tmdb.org/t/p/w500${i.poster_path}` : 'https://via.placeholder.com/500x750?text=Sem+Capa',
-            bg: i.backdrop_path ? `https://image.tmdb.org/t/p/original${i.backdrop_path}` : 'https://via.placeholder.com/1280x720?text=Sem+Fundo',
+            img: `https://image.tmdb.org/t/p/w500${i.poster_path}`,
+            bg: `https://image.tmdb.org/t/p/original${i.backdrop_path}`,
             desc: i.overview || "Sem sinopse disponível.",
             score: i.vote_average ? i.vote_average.toFixed(1) : '?',
             genres: i.genres?.map(g => g.name) || [],
-            status: 'Para Ver', folders: [],
+            status: 'Para Ver', folder: 'Nenhuma',
             temporada: 1, episodio: 1,
             recs: i.recommendations?.results.slice(0, 6) || []
         });
@@ -215,7 +501,7 @@
         let filtered = db.filter(i => {
             const mType = filters.type === 'all' || i.type === filters.type;
             const mStatus = filters.status === 'all' || i.status === filters.status;
-            const mFolder = filters.folder === 'all' || (i.folders && i.folders.includes(filters.folder));
+            const mFolder = filters.folder === 'all' || i.folder === filters.folder;
             const mGenre = filters.genre === 'all' || i.genres.includes(filters.genre);
             const mSearch = i.title.toLowerCase().includes(searchTerm);
             return mType && mStatus && mFolder && mGenre && mSearch;
@@ -224,12 +510,10 @@
         container.innerHTML = filtered.map(i => `
             <div class="m-card" onclick="openModal(${i.id})">
                 <img src="${i.img}">
-                <div class="card-info">
-                    <div class="fw-bold small text-truncate mb-1">${i.title}</div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold text-gold" style="font-size:0.8rem">⭐ ${i.score}</span>
-                        <button class="btn btn-link p-0 text-danger text-decoration-none fw-bold" style="font-size:0.65rem; pointer-events: auto;" onclick="event.stopPropagation(); remove(${i.id})">APAGAR</button>
-                    </div>
+                <div class="card-title">${i.title}</div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold" style="color:var(--accent-gold); font-size:0.8rem">⭐ ${i.score}</span>
+                    <button class="btn btn-link p-0 text-danger text-decoration-none fw-bold" style="font-size:0.65rem" onclick="event.stopPropagation(); remove(${i.id})">APAGAR</button>
                 </div>
             </div>`).join('');
     }
@@ -238,11 +522,11 @@
         const bar = document.getElementById('folderBar');
         bar.innerHTML = `<button class="btn-tool ${filters.folder === 'all' ? 'active' : ''}" onclick="setFilter('folder', 'all', this)">Todas Pastas</button>` + 
             folders.map(f => `
-                <div class="btn-tool ${filters.folder === f ? 'active' : ''}">
-                    <span onclick="setFilter('folder', '${f}', this.parentElement)">${f}</span>
-                    <small class="ms-2 text-danger fw-bold" style="cursor:pointer" onclick="deleteFolder('${f}')">✕</small>
+                <div style="display:inline-flex; align-items:center; background:white; border:2px solid #e2e8f0; border-radius:10px; padding:8px 12px; gap:8px;" class="${filters.folder === f ? 'active' : ''}">
+                    <span style="cursor:pointer; font-weight:700; font-size:0.85rem;" onclick="setFilter('folder', '${f}', this.parentElement)">${f}</span>
+                    <small class="text-danger fw-bold" style="cursor:pointer" onclick="deleteFolder('${f}')">✕</small>
                 </div>`).join('') +
-            `<button class="btn btn-sm btn-outline-warning ms-2 fw-bold" onclick="newFolder()">+ NOVA PASTA</button>`;
+            `<button class="btn btn-sm btn-outline-warning fw-bold" onclick="newFolder()">+ NOVA PASTA</button>`;
     }
 
     function renderGenreBar() {
@@ -260,59 +544,47 @@
             <img src="${i.bg}" class="modal-header-img">
             <div class="p-4 pt-0" style="margin-top:-60px; position:relative">
                 <div class="d-flex gap-4 align-items-end mb-4">
-                    <img src="${i.img}" style="width:130px; border-radius:18px; border:5px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.1)">
+                    <img src="${i.img}" style="width:130px; border-radius:18px; border:5px solid white;">
                     <div class="pb-2">
                         <h3 class="fw-bold text-dark mb-1">${i.title}</h3>
-                        <a href="https://www.youtube.com/results?search_query=${i.title} trailer" target="_blank" class="btn-youtube">Trailer YouTube</a>
+                        <span class="badge bg-warning text-dark me-2">⭐ ${i.score}</span>
+                        ${i.genres.map(g => `<span class="badge bg-light text-dark me-1">${g}</span>`).join('')}
+                        <div class="mt-2">
+                            <a href="https://www.youtube.com/results?search_query=${i.title} trailer" target="_blank" class="btn-youtube">▶️ Trailer YouTube</a>
+                        </div>
                     </div>
                 </div>
                 ${i.type === 'tv' ? `<div class="bg-light p-3 rounded-4 mb-3 d-flex justify-content-between align-items-center border">
-                    <div class="fw-bold text-dark">
-                        T: <input type="number" class="border-0 bg-transparent fw-bold" style="width:40px" value="${i.temporada}" onchange="update(${i.id}, 'temporada', this.value)"> | 
-                        E: <input type="number" class="border-0 bg-transparent fw-bold" style="width:40px" value="${i.episodio}" onchange="update(${i.id}, 'episodio', this.value)">
+                    <div class="fw-bold text-dark">Temporada ${i.temporada} | Episódio ${i.episodio}</div>
+                    <div class="d-flex gap-2">
+                        <input type="number" class="form-control form-control-sm" style="width:70px" value="${i.episodio}" onchange="update(${i.id}, 'episodio', this.value)">
+                        <button class="btn btn-sm btn-warning fw-bold" onclick="nextEp(${i.id})">+1 Ep</button>
                     </div>
-                    <button class="btn btn-sm btn-warning fw-bold" onclick="nextEp(${i.id})">+1 Ep</button>
                 </div>` : ''}
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label class="small fw-bold text-muted mb-1">STATUS</label>
+                <p class="text-muted small">${i.desc}</p>
+                <div class="row g-2 mt-3">
+                    <div class="col-6">
+                        <label class="small fw-bold text-muted">STATUS</label>
                         <select class="form-select" onchange="update(${i.id}, 'status', this.value)">
                             <option ${i.status === 'Para Ver' ? 'selected' : ''}>Para Ver</option>
                             <option ${i.status === 'A Ver' ? 'selected' : ''}>A Ver</option>
                             <option ${i.status === 'Visto' ? 'selected' : ''}>Visto</option>
                         </select>
                     </div>
-                    <div class="col-md-6">
-                        <label class="small fw-bold text-muted mb-1">PASTAS SELECIONADAS:</label>
-                        <div class="folder-check-list">
-                            ${folders.map(f => `
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="${f}" id="f-${f}" 
-                                    ${(i.folders || []).includes(f) ? 'checked' : ''} 
-                                    onchange="toggleFolder(${i.id}, '${f}')">
-                                    <label class="form-check-label small" for="f-${f}">${f}</label>
-                                </div>`).join('')}
-                        </div>
+                    <div class="col-6">
+                        <label class="small fw-bold text-muted">PASTA</label>
+                        <select class="form-select" onchange="update(${i.id}, 'folder', this.value)">
+                            <option value="Nenhuma">Nenhuma</option>
+                            ${folders.map(f => `<option value="${f}" ${i.folder === f ? 'selected' : ''}>${f}</option>`).join('')}
+                        </select>
                     </div>
                 </div>
-                <p class="text-muted small">${i.desc}</p>
-                <h6 class="mt-4 fw-bold text-dark">RECOMENDAÇÕES</h6>
+                ${i.recs.length > 0 ? `<h6 class="mt-4 fw-bold text-dark">RECOMENDAÇÕES</h6>
                 <div class="scroll-row">
-                    ${i.recs.map(r => `<div class="text-center" style="width:90px; cursor:pointer" onclick="add(${r.id}, '${i.type}')"><img src="https://image.tmdb.org/t/p/w200${r.poster_path}" class="rounded-3 w-100 mb-1"><div style="font-size:0.6rem; font-weight:bold" class="text-truncate">${r.title || r.name}</div></div>`).join('')}
-                </div>
+                    ${i.recs.map(r => `<div class="text-center" style="min-width:90px; cursor:pointer" onclick="add(${r.id}, '${i.type}')"><img src="https://image.tmdb.org/t/p/w200${r.poster_path}" class="rounded-3 w-100 mb-1"><div style="font-size:0.6rem; font-weight:bold" class="text-truncate">${r.title || r.name}</div></div>`).join('')}
+                </div>` : ''}
             </div>`;
         new bootstrap.Modal(document.getElementById('win')).show();
-    }
-
-    function toggleFolder(id, folderName) {
-        const i = db.find(x => x.id === id);
-        if(!i.folders) i.folders = [];
-        if(i.folders.includes(folderName)) {
-            i.folders = i.folders.filter(f => f !== folderName);
-        } else {
-            i.folders.push(folderName);
-        }
-        save();
     }
 
     function remove(id) { const idx = db.findIndex(x => x.id === id); historyStack.push({...db[idx]}); db.splice(idx, 1); save(); showUndo(); }
@@ -321,11 +593,20 @@
     function update(id, k, v) { const i = db.find(x => x.id === id); if(i) { i[k] = v; save(); } }
     function nextEp(id) { const i = db.find(x => x.id === id); i.episodio++; save(); openModal(id); }
     function newFolder() { const n = prompt("Nome da nova pasta:"); if(n) { folders.push(n); save(); } }
-    function deleteFolder(name) { if(confirm(`Remover pasta "${name}"?`)) { folders = folders.filter(f => f !== name); db.forEach(i => { if(i.folders) i.folders = i.folders.filter(fn => fn !== name); }); save(); } }
+    function deleteFolder(name) { if(confirm(`Remover pasta "${name}"?`)) { folders = folders.filter(f => f !== name); db.forEach(i => { if(i.folder === name) i.folder = 'Nenhuma'; }); save(); } }
     function pickRandom() { if(db.length > 0) { const r = db[Math.floor(Math.random()*db.length)]; openModal(r.id); } }
-    function exportJSON() { const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const a = document.createElement('a'); a.href = data; a.download = "cinetrack_gold_backup.json"; a.click(); }
+    function exportJSON() { const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({db, folders})); const a = document.createElement('a'); a.href = data; a.download = "cinetrack_gold_backup.json"; a.click(); }
+    function importJSON(input) { const reader = new FileReader(); reader.onload = (e) => { try { const data = JSON.parse(e.target.result); db = data.db || data; folders = data.folders || folders; save(); alert("✅ Dados importados!"); } catch(err) { alert("Erro ao importar!"); } }; reader.readAsText(input.files[0]); }
 
-    window.onload = () => { render(); renderFolderBar(); renderGenreBar(); };
+    document.addEventListener('click', (e) => {
+        const term = document.getElementById('term');
+        const sugg = document.getElementById('suggestions');
+        if(!term.contains(e.target) && !sugg.contains(e.target)) {
+            sugg.style.display = 'none';
+        }
+    });
+
+    window.onload = () => { render(); renderStats(); renderFolderBar(); renderGenreBar(); };
 </script>
 </body>
 </html>
