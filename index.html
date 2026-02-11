@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineTrack PRO - Permanent Memory</title>
+    <title>CineTrack PRO - Ultimate Fix</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root { 
@@ -24,10 +24,10 @@
         #suggestions { position: absolute; width: 100%; background: #1e293b; border: 1px solid var(--accent); border-radius: 10px; display: none; z-index: 2000; margin-top: 5px; max-height: 300px; overflow-y: auto; }
         .btn-random { background: var(--star); color: #020617; border: none; border-radius: 15px; padding: 0 20px; font-weight: 800; font-size: 1.2rem; }
 
-        .scroll-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; margin-bottom: 10px; scrollbar-width: none; }
+        .scroll-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; margin-bottom: 10px; scrollbar-width: none; align-items: center; }
         .scroll-row::-webkit-scrollbar { display: none; }
         
-        .btn-tool { background: #1e293b; color: white; border: 1px solid #334155; border-radius: 10px; padding: 6px 15px; font-size: 0.85rem; white-space: nowrap; }
+        .btn-tool { background: #1e293b; color: white; border: 1px solid #334155; border-radius: 10px; padding: 6px 15px; font-size: 0.85rem; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
         .btn-tool.active { background: var(--accent); color: #020617; font-weight: bold; }
         
         .btn-genre { background: transparent; color: var(--text-dim); border: 1px solid #334155; border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; white-space: nowrap; }
@@ -35,55 +35,40 @@
 
         #myList.grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
         .m-card { background: var(--bg-card); border-radius: 15px; padding: 12px; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s ease; cursor: pointer; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-        .m-card:hover { border-color: var(--accent); transform: translateY(-3px); }
         .m-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; }
 
-        .modal-content { background: #0f172a; border-radius: 24px; border: 1px solid #334155; overflow: hidden; }
-        .backdrop-img { width: 100%; height: 350px; object-fit: cover; mask-image: linear-gradient(to bottom, black 50%, transparent 100%); }
-        .modal-body { padding: 0 30px 30px; margin-top: -100px; position: relative; }
-        .poster-main { width: 140px; border-radius: 15px; border: 4px solid #0f172a; box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
-        
-        .btn-youtube { background: var(--youtube-red); color: white; font-weight: bold; border: none; border-radius: 10px; padding: 8px 15px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+        .modal-content { background: #0f172a; border-radius: 24px; border: 1px solid #334155; overflow-y: auto; max-height: 90vh; }
+        .backdrop-img { width: 100%; height: 250px; object-fit: cover; mask-image: linear-gradient(to bottom, black 50%, transparent 100%); }
+        .modal-body { padding: 0 30px 30px; margin-top: -60px; position: relative; }
+        .poster-main { width: 120px; border-radius: 15px; border: 4px solid #0f172a; }
 
-        .side-pane { background: rgba(15, 23, 42, 0.98); border-left: 1px solid #334155; height: 100vh; position: fixed; right: -350px; top: 0; width: 350px; z-index: 4000; transition: 0.4s; padding: 25px; backdrop-filter: blur(15px); }
-        .side-pane.open { right: 0; }
+        .recommend-card { width: 100px; flex-shrink: 0; cursor: pointer; }
+        .recommend-card img { width: 100%; border-radius: 8px; }
         
-        #undoBanner { display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #020617; padding: 12px 25px; border-radius: 15px; font-weight: 800; z-index: 5000; }
+        #undoBanner { display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #020617; padding: 12px 25px; border-radius: 15px; font-weight: 800; z-index: 5000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
-<div id="undoBanner">REMOVIDO <button class="btn btn-sm btn-dark ms-2 rounded-pill fw-bold" onclick="undo()">DESFAZER</button></div>
-
-<div class="side-pane shadow-lg" id="histPane">
-    <div class="d-flex justify-content-between align-items-center mb-4"><h5 class="m-0 fw-bold">Atividade</h5><button class="btn-close btn-close-white" onclick="togglePane('histPane')"></button></div>
-    <div id="histContent"></div>
-</div>
-
-<div class="side-pane shadow-lg" id="calPane">
-    <div class="d-flex justify-content-between align-items-center mb-4"><h5 class="m-0 fw-bold">📅 Estreias</h5><button class="btn-close btn-close-white" onclick="togglePane('calPane')"></button></div>
-    <div id="calContent"></div>
-</div>
+<div id="undoBanner">Ação removida <button class="btn btn-sm btn-dark ms-2 rounded-pill" onclick="undo()">DESFAZER</button></div>
 
 <div class="container py-4">
     <header class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold m-0"><span style="color:var(--accent)">Cine</span>Track</h2>
         <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-warning rounded-pill fw-bold" onclick="updateCalendar()">Calendário</button>
-            <button class="btn btn-sm btn-outline-info rounded-pill" onclick="togglePane('histPane')">Histórico</button>
-            <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="exportJSON()">Exportar</button>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="exportJSON()">Backup</button>
         </div>
     </header>
 
     <div class="stats-bar" id="statsArea"></div>
 
     <div class="search-container">
-        <input type="text" id="term" class="form-control form-control-lg" placeholder="Adicionar filme ou série..." onkeyup="search()">
+        <input type="text" id="term" class="form-control form-control-lg" placeholder="Pesquisar..." onkeyup="search()">
         <button class="btn-random" onclick="pickRandom()">🎲</button>
         <div id="suggestions"></div>
     </div>
 
-    <div class="d-flex gap-2 justify-content-center mb-3">
+    <div class="scroll-row justify-content-center mb-3">
         <button class="btn-tool active" id="btn-all" onclick="setFilter('all')">Tudo</button>
         <button class="btn-tool" id="btn-movie" onclick="setFilter('movie')">Filmes</button>
         <button class="btn-tool" id="btn-tv" onclick="setFilter('tv')">Séries</button>
@@ -95,7 +80,7 @@
     <div id="myList" class="grid-view"></div>
 </div>
 
-<div class="modal fade" id="win" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="win" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content" id="winContent"></div>
     </div>
@@ -105,16 +90,13 @@
 
 <script>
     const KEY = '8661bff51991b4bcd2a9a9e9fa66b639';
-    // NOME DA MEMÓRIA FIXADO PARA EVITAR PERDAS
     const DB_NAME = 'cinetrack_production_v1';
     const FL_NAME = 'cinetrack_folders_v1';
 
     let db = JSON.parse(localStorage.getItem(DB_NAME)) || [];
     let folders = JSON.parse(localStorage.getItem(FL_NAME)) || ["Favoritos"];
     let historyStack = [];
-    let currentFilter = 'all';
-    let currentFolderFilter = 'all';
-    let currentGenreFilter = 'all';
+    let currentFilter = 'all', currentFolderFilter = 'all', currentGenreFilter = 'all';
 
     function save() { 
         localStorage.setItem(DB_NAME, JSON.stringify(db)); 
@@ -139,8 +121,9 @@
     async function add(id, type) {
         document.getElementById('suggestions').style.display = 'none';
         document.getElementById('term').value = '';
-        const r = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${KEY}&append_to_response=watch/providers&language=pt-PT`);
+        const r = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${KEY}&language=pt-PT&append_to_response=recommendations`);
         const i = await r.json();
+        if(db.some(x => x.id === i.id)) return;
         db.unshift({
             id: i.id, type: type, title: i.title || i.name,
             img: `https://image.tmdb.org/t/p/w500${i.poster_path}`,
@@ -149,9 +132,8 @@
             score: i.vote_average ? i.vote_average.toFixed(1) : '?',
             genres: i.genres?.map(g => g.name) || [],
             status: 'Para Ver', folder: 'Nenhuma',
-            temporada: 1, episodio: 1, 
-            streaming: i['watch/providers']?.results?.PT?.flatrate || [],
-            next_date: i.next_episode_to_air?.air_date || i.release_date || ''
+            temporada: 1, episodio: 1,
+            recs: i.recommendations?.results.slice(0, 6) || []
         });
         save();
     }
@@ -169,83 +151,73 @@
                 <div class="fw-bold small text-truncate text-white">${i.title}</div>
                 <div class="d-flex justify-content-between mt-1">
                     <span style="color:var(--tmdb-green); font-size:0.75rem">⭐ ${i.score}</span>
-                    ${i.type === 'tv' ? `<span class="text-dim" style="font-size:0.7rem">S${i.temporada} E${i.episodio}</span>` : ''}
+                    <button class="btn btn-sm p-0 text-danger" onclick="event.stopPropagation(); remove(${i.id})">Apagar</button>
                 </div>
-                <button class="btn btn-sm text-danger opacity-50 position-absolute top-0 end-0" onclick="event.stopPropagation(); remove(${i.id})">✕</button>
             </div>`).join('');
     }
 
     function renderFolderBar() {
         const bar = document.getElementById('folderBar');
-        bar.innerHTML = `<button class="btn-tool ${currentFolderFilter === 'all' ? 'active' : ''}" onclick="setFolderFilter('all')">Todas Pastas</button>` + 
-            folders.map(f => `<button class="btn-tool ${currentFolderFilter === f ? 'active' : ''}" onclick="setFolderFilter('${f}')">${f}</button>`).join('') +
-            `<button class="btn btn-sm btn-outline-info ms-2" onclick="newFolder()">+ Nova</button>`;
+        bar.innerHTML = `<button class="btn-tool ${currentFolderFilter === 'all' ? 'active' : ''}" onclick="setFolderFilter('all')">Tudo</button>` + 
+            folders.map(f => `
+                <div class="btn-tool ${currentFolderFilter === f ? 'active' : ''}">
+                    <span onclick="setFolderFilter('${f}')">${f}</span>
+                    <small class="ms-2 text-danger" style="cursor:pointer" onclick="deleteFolder('${f}')">✕</small>
+                </div>`).join('') +
+            `<button class="btn btn-sm btn-outline-info ms-2" onclick="newFolder()">+ Pasta</button>`;
     }
 
     function renderGenreBar() {
         const bar = document.getElementById('genreBar');
         const all = [...new Set(db.flatMap(i => i.genres))].sort();
-        bar.innerHTML = `<button class="btn-genre ${currentGenreFilter === 'all' ? 'active' : ''}" onclick="setGenreFilter('all')">Todos Géneros</button>` + 
+        bar.innerHTML = `<button class="btn-genre ${currentGenreFilter === 'all' ? 'active' : ''}" onclick="setGenreFilter('all')">Todos</button>` + 
             all.map(g => `<button class="btn-genre ${currentGenreFilter === g ? 'active' : ''}" onclick="setGenreFilter('${g}')">${g}</button>`).join('');
     }
 
     function openModal(id) {
         const i = db.find(x => x.id === id);
-        const ytLink = `https://www.youtube.com/results?search_query=${encodeURIComponent(i.title + ' trailer pt')}`;
         const win = document.getElementById('winContent');
         win.innerHTML = `
-            <div class="position-relative"><img src="${i.bg}" class="backdrop-img"><button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4" data-bs-dismiss="modal"></button></div>
+            <div class="position-relative"><img src="${i.bg}" class="backdrop-img"></div>
             <div class="modal-body">
-                <div class="d-flex gap-4 align-items-end mb-4">
+                <div class="d-flex gap-3 align-items-end mb-4">
                     <img src="${i.img}" class="poster-main">
-                    <div class="flex-grow-1">
-                        <h2 class="fw-bold text-white mb-2">${i.title}</h2>
-                        <div class="d-flex gap-2 align-items-center mb-3">
-                            ${i.streaming.map(s => `<img src="https://image.tmdb.org/t/p/w92${s.logo_path}" style="width:30px; border-radius:6px">`).join('')}
-                            <a href="${ytLink}" target="_blank" class="btn-youtube">YouTube</a>
-                        </div>
+                    <div>
+                        <h4 class="fw-bold text-white mb-2">${i.title}</h4>
+                        <a href="https://www.youtube.com/results?search_query=${i.title} trailer" target="_blank" class="btn btn-sm btn-danger">YouTube</a>
                     </div>
                 </div>
-                ${i.type === 'tv' ? `
-                <div class="bg-dark p-3 rounded-4 mb-3 border border-secondary d-flex justify-content-between align-items-center">
-                    <div class="d-flex gap-2 align-items-center">
-                        <span class="small fw-bold">T:</span><input type="number" class="form-control form-control-sm bg-secondary text-white border-0 w-25" value="${i.temporada}" onchange="update(${i.id}, 'temporada', this.value)">
-                        <span class="small fw-bold ms-2">E:</span><input type="number" class="form-control form-control-sm bg-secondary text-white border-0 w-25" value="${i.episodio}" onchange="update(${i.id}, 'episodio', this.value)">
-                    </div>
-                    <button class="btn btn-info fw-bold" onclick="nextEp(${i.id})">+1 Ep</button>
+                ${i.type === 'tv' ? `<div class="bg-dark p-2 rounded-3 mb-3 d-flex justify-content-between">
+                    <span>S: ${i.temporada} E: ${i.episodio}</span>
+                    <button class="btn btn-sm btn-info" onclick="nextEp(${i.id})">+1 Ep</button>
                 </div>` : ''}
                 <p class="small text-dim">${i.desc}</p>
-                <div class="row g-2 mt-3 bg-dark p-3 rounded-4">
-                    <div class="col-6"><select class="form-select bg-dark text-white border-0" onchange="update(${i.id}, 'status', this.value)"><option ${i.status === 'Para Ver' ? 'selected' : ''}>Para Ver</option><option ${i.status === 'Visto' ? 'selected' : ''}>Visto</option></select></div>
-                    <div class="col-6"><select class="form-select bg-dark text-info border-0" onchange="update(${i.id}, 'folder', this.value)"><option value="Nenhuma">Pasta: Nenhuma</option>${folders.map(f => `<option value="${f}" ${i.folder === f ? 'selected' : ''}>${f}</option>`).join('')}</select></div>
+                
+                <h6 class="mt-4 text-accent">Sugestões / Saga:</h6>
+                <div class="d-flex gap-2 overflow-x-auto pb-2">
+                    ${i.recs.map(r => `<div class="recommend-card" onclick="add(${r.id}, '${i.type}')"><img src="https://image.tmdb.org/t/p/w200${r.poster_path}"><div class="small text-truncate mt-1">${r.title || r.name}</div></div>`).join('')}
+                </div>
+
+                <div class="row g-2 mt-3">
+                    <div class="col-6"><select class="form-select bg-dark text-white border-secondary" onchange="update(${i.id}, 'status', this.value)"><option ${i.status === 'Para Ver' ? 'selected' : ''}>Para Ver</option><option ${i.status === 'Visto' ? 'selected' : ''}>Visto</option></select></div>
+                    <div class="col-6"><select class="form-select bg-dark text-info border-secondary" onchange="update(${i.id}, 'folder', this.value)"><option value="Nenhuma">Mover para...</option>${folders.map(f => `<option value="${f}" ${i.folder === f ? 'selected' : ''}>${f}</option>`).join('')}</select></div>
                 </div>
             </div>`;
         new bootstrap.Modal(document.getElementById('win')).show();
     }
 
+    function deleteFolder(name) { if(confirm(`Apagar a pasta "${name}"?`)) { folders = folders.filter(f => f !== name); db.forEach(i => { if(i.folder === name) i.folder = 'Nenhuma'; }); save(); } }
+    function remove(id) { const idx = db.findIndex(x => x.id === id); historyStack.push({...db[idx]}); db.splice(idx, 1); save(); showUndo(); }
+    function showUndo() { const b = document.getElementById('undoBanner'); b.style.display = 'block'; setTimeout(() => b.style.display = 'none', 5000); }
+    function undo() { if(historyStack.length) { db.unshift(historyStack.pop()); save(); } document.getElementById('undoBanner').style.display = 'none'; }
     function setFilter(f) { currentFilter = f; render(); }
     function setFolderFilter(f) { currentFolderFilter = f; render(); renderFolderBar(); }
     function setGenreFilter(g) { currentGenreFilter = g; render(); renderGenreBar(); }
-    function newFolder() { const n = prompt("Nome da nova pasta:"); if(n) { folders.push(n); save(); } }
+    function newFolder() { const n = prompt("Nome da pasta:"); if(n) { folders.push(n); save(); } }
     function update(id, k, v) { db.find(x => x.id === id)[k] = v; save(); }
-    function nextEp(id) { const i = db.find(x => x.id === id); i.episodio = parseInt(i.episodio) + 1; save(); openModal(id); }
-    function togglePane(id) { document.getElementById(id).classList.toggle('open'); }
-    function remove(id) { const idx = db.findIndex(x => x.id === id); historyStack.push(db[idx]); db.splice(idx, 1); save(); document.getElementById('undoBanner').style.display = 'block'; setTimeout(() => document.getElementById('undoBanner').style.display = 'none', 5000); }
-    function undo() { if(historyStack.length) { db.unshift(historyStack.pop()); save(); } document.getElementById('undoBanner').style.display = 'none'; }
-    function renderStats() {
-        const v = db.filter(i => i.status === 'Visto').length;
-        document.getElementById('statsArea').innerHTML = `<div><span class="stat-val">${db.length}</span><span class="stat-label">Lista</span></div><div><span class="stat-val">${v}</span><span class="stat-label">Vistos</span></div>`;
-    }
-    function updateCalendar() {
-        const content = document.getElementById('calContent');
-        const today = new Date().toISOString().split('T')[0];
-        const future = db.filter(i => i.next_date && i.next_date >= today).sort((a,b) => a.next_date.localeCompare(b.next_date));
-        content.innerHTML = future.map(i => `<div class="bg-dark p-3 rounded-4 mb-2"><strong>${i.title}</strong><br><small class="text-accent">${i.next_date}</small></div>`).join('') || "Sem estreias.";
-        togglePane('calPane');
-    }
-    function pickRandom() { if(db.length) openModal(db[Math.floor(Math.random()*db.length)].id); }
-    function exportJSON() { const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const a = document.createElement('a'); a.href = data; a.download = "cine.json"; a.click(); }
-
+    function nextEp(id) { const i = db.find(x => x.id === id); i.episodio++; save(); openModal(id); }
+    function renderStats() { document.getElementById('statsArea').innerHTML = `<div><span class="stat-val">${db.length}</span><span class="stat-label">Total</span></div><div><span class="stat-val">${db.filter(x=>x.status==='Visto').length}</span><span class="stat-label">Vistos</span></div>`; }
+    function exportJSON() { const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const a = document.createElement('a'); a.href = data; a.download = "cine_backup.json"; a.click(); }
     window.onload = () => { render(); renderStats(); renderFolderBar(); renderGenreBar(); };
 </script>
 </body>
