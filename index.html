@@ -3,115 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineTrack PRO - Gold Edition</title>
+    <title>CineTrack PRO - Multi-Folder Edition</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root { 
-            --bg-body: #f1f5f9; 
-            --bg-card: #ffffff; 
-            --accent-gold: #f59e0b; 
-            --text-dark: #0f172a; 
-            --text-muted: #64748b; 
-            --btn-dark: #1e293b;
+            --bg-body: #f1f5f9; --bg-card: #ffffff; --accent-gold: #f59e0b; 
+            --text-dark: #0f172a; --text-muted: #64748b; --btn-dark: #1e293b;
         }
 
-        body { 
-            background-color: var(--bg-body); 
-            color: var(--text-dark); 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-            padding-bottom: 50px; 
-        }
-
-        header h2 { color: var(--text-dark); font-weight: 800; }
+        body { background-color: var(--bg-body); color: var(--text-dark); font-family: 'Inter', sans-serif; padding-bottom: 50px; }
         .text-gold { color: var(--accent-gold) !important; }
 
-        .search-section { 
-            background: var(--bg-card); 
-            padding: 25px; 
-            border-radius: 20px; 
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); 
-            margin-bottom: 30px; 
-        }
-        
-        .form-control-custom { 
-            background: #f8fafc !important; 
-            border: 2px solid #e2e8f0 !important; 
-            color: var(--text-dark) !important; 
-            border-radius: 12px; 
-        }
-        .form-control-custom:focus { border-color: var(--accent-gold) !important; box-shadow: none; }
-
+        .search-section { background: var(--bg-card); padding: 25px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .form-control-custom { background: #f8fafc !important; border: 2px solid #e2e8f0 !important; border-radius: 12px; }
         .filter-group { background: #f8fafc; padding: 10px; border-radius: 15px; display: flex; gap: 8px; flex-wrap: wrap; }
         
         .btn-gold { background: var(--accent-gold); color: white; font-weight: bold; border-radius: 10px; border: none; padding: 8px 20px; }
-        .btn-gold:hover { background: #d97706; color: white; }
-        
-        .btn-tool { 
-            background: white; 
-            color: var(--text-muted); 
-            border: 1px solid #e2e8f0; 
-            border-radius: 10px; 
-            padding: 6px 15px; 
-            font-size: 0.85rem; 
-            font-weight: 600;
-            transition: 0.2s;
-        }
-        .btn-tool.active { 
-            background: var(--accent-gold); 
-            color: white; 
-            border-color: var(--accent-gold); 
-        }
+        .btn-tool { background: white; color: var(--text-muted); border: 1px solid #e2e8f0; border-radius: 10px; padding: 6px 15px; font-size: 0.85rem; font-weight: 600; }
+        .btn-tool.active { background: var(--accent-gold); color: white; border-color: var(--accent-gold); }
 
         #myList.grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-        .m-card { 
-            background: var(--bg-card); 
-            border-radius: 18px; 
-            padding: 12px; 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); 
-            border: 1px solid #f1f5f9;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-        }
-        .m-card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border-color: var(--accent-gold); }
+        .m-card { background: var(--bg-card); border-radius: 18px; padding: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; cursor: pointer; transition: 0.3s; }
+        .m-card:hover { transform: translateY(-8px); border-color: var(--accent-gold); }
         .m-card img { width: 100%; height: 210px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; }
 
-        .modal-content { border-radius: 28px; border: none; overflow: hidden; background: white; }
+        .modal-content { border-radius: 28px; border: none; overflow: hidden; }
         .modal-header-img { width: 100%; height: 220px; object-fit: cover; }
-        .btn-youtube { background: #ff0000; color: white; font-weight: bold; border-radius: 8px; text-decoration: none; padding: 5px 12px; font-size: 0.8rem; }
+        .folder-check-list { max-height: 120px; overflow-y: auto; background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px solid #e2e8f0; }
 
         .scroll-row { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
-        #undoBanner { 
-            display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
-            background: var(--btn-dark); color: white; padding: 15px 30px; border-radius: 50px; 
-            z-index: 9999; box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
-        }
-        
-        #suggestions { 
-            position: absolute; width: 100%; background: white; z-index: 2000; 
-            border-radius: 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;
-            display: none; margin-top: 5px; 
-        }
+        #undoBanner { display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--btn-dark); color: white; padding: 15px 30px; border-radius: 50px; z-index: 9999; }
+        #suggestions { position: absolute; width: 100%; background: white; z-index: 2000; border-radius: 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); display: none; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-<div id="undoBanner">
-    🗑️ Item removido <button class="btn btn-sm btn-warning ms-3 fw-bold rounded-pill" onclick="undo()">DESFAZER</button>
-</div>
+<div id="undoBanner">🗑️ Item removido <button class="btn btn-sm btn-warning ms-3 fw-bold rounded-pill" onclick="undo()">DESFAZER</button></div>
 
 <div class="container py-5">
     <header class="d-flex justify-content-between align-items-center mb-5">
         <h2 class="m-0">CineTrack <span class="text-gold">PRO</span></h2>
-        <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-outline-dark rounded-pill px-3" onclick="exportJSON()">Backup JSON</button>
-        </div>
+        <button class="btn btn-sm btn-outline-dark rounded-pill px-3" onclick="exportJSON()">Backup JSON</button>
     </header>
 
     <div class="search-section">
         <div class="row g-3">
             <div class="col-md-8 position-relative">
                 <label class="small fw-bold text-muted mb-1">ADICIONAR NOVO</label>
-                <input type="text" id="term" class="form-control form-control-lg form-control-custom" placeholder="Pesquisar na Cloud..." onkeyup="searchGlobal()">
+                <input type="text" id="term" class="form-control form-control-lg form-control-custom" placeholder="Pesquisar..." onkeyup="searchGlobal()">
                 <div id="suggestions"></div>
             </div>
             <div class="col-md-4">
@@ -120,23 +59,20 @@
             </div>
         </div>
 
-        <div class="mt-4">
-            <div class="d-flex flex-wrap gap-3 align-items-center">
-                <div class="filter-group">
-                    <button class="btn-tool active" data-type="all" onclick="setFilter('type', 'all', this)">Tudo</button>
-                    <button class="btn-tool" data-type="movie" onclick="setFilter('type', 'movie', this)">Filmes</button>
-                    <button class="btn-tool" data-type="tv" onclick="setFilter('type', 'tv', this)">Séries</button>
-                </div>
-                <div class="filter-group">
-                    <button class="btn-tool active" data-status="all" onclick="setFilter('status', 'all', this)">Todos</button>
-                    <button class="btn-tool" data-status="Para Ver" onclick="setFilter('status', 'Para Ver', this)">Para Ver</button>
-                    <button class="btn-tool" data-status="A Ver" onclick="setFilter('status', 'A Ver', this)">A Ver</button>
-                    <button class="btn-tool" data-status="Visto" onclick="setFilter('status', 'Visto', this)">Vistos</button>
-                </div>
-                <button class="btn btn-gold" onclick="pickRandom()">🎲 ALEATÓRIO</button>
+        <div class="mt-4 d-flex flex-wrap gap-3 align-items-center">
+            <div class="filter-group">
+                <button class="btn-tool active" onclick="setFilter('type', 'all', this)">Tudo</button>
+                <button class="btn-tool" onclick="setFilter('type', 'movie', this)">Filmes</button>
+                <button class="btn-tool" onclick="setFilter('type', 'tv', this)">Séries</button>
             </div>
+            <div class="filter-group">
+                <button class="btn-tool active" onclick="setFilter('status', 'all', this)">Todos Status</button>
+                <button class="btn-tool" onclick="setFilter('status', 'Para Ver', this)">Para Ver</button>
+                <button class="btn-tool" onclick="setFilter('status', 'A Ver', this)">A Ver</button>
+                <button class="btn-tool" onclick="setFilter('status', 'Visto', this)">Vistos</button>
+            </div>
+            <button class="btn btn-gold" onclick="pickRandom()">🎲 ALEATÓRIO</button>
         </div>
-
         <div class="scroll-row mt-3" id="folderBar"></div>
         <div class="scroll-row" id="genreBar"></div>
     </div>
@@ -150,7 +86,7 @@
 
 <script>
     const KEY = '8661bff51991b4bcd2a9a9e9fa66b639';
-    const DB_NAME = 'cinetrack_production_v1';
+    const DB_NAME = 'cinetrack_multi_v1';
     const FL_NAME = 'cinetrack_folders_v1';
 
     let db = JSON.parse(localStorage.getItem(DB_NAME)) || [];
@@ -188,10 +124,10 @@
             id: i.id, type: type, title: i.title || i.name,
             img: `https://image.tmdb.org/t/p/w500${i.poster_path}`,
             bg: `https://image.tmdb.org/t/p/original${i.backdrop_path}`,
-            desc: i.overview || "Sem sinopse disponível.",
+            desc: i.overview || "Sem sinopse.",
             score: i.vote_average ? i.vote_average.toFixed(1) : '?',
             genres: i.genres?.map(g => g.name) || [],
-            status: 'Para Ver', folder: 'Nenhuma',
+            status: 'Para Ver', folders: [], // Agora é um array
             temporada: 1, episodio: 1,
             recs: i.recommendations?.results.slice(0, 6) || []
         });
@@ -213,7 +149,7 @@
         let filtered = db.filter(i => {
             const mType = filters.type === 'all' || i.type === filters.type;
             const mStatus = filters.status === 'all' || i.status === filters.status;
-            const mFolder = filters.folder === 'all' || i.folder === filters.folder;
+            const mFolder = filters.folder === 'all' || (i.folders && i.folders.includes(filters.folder));
             const mGenre = filters.genre === 'all' || i.genres.includes(filters.genre);
             const mSearch = i.title.toLowerCase().includes(searchTerm);
             return mType && mStatus && mFolder && mGenre && mSearch;
@@ -224,7 +160,7 @@
                 <img src="${i.img}">
                 <div class="fw-bold small text-truncate mb-1">${i.title}</div>
                 <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-bold" style="color:var(--accent-gold); font-size:0.8rem">⭐ ${i.score}</span>
+                    <span class="fw-bold text-gold" style="font-size:0.8rem">⭐ ${i.score}</span>
                     <button class="btn btn-link p-0 text-danger text-decoration-none fw-bold" style="font-size:0.65rem" onclick="event.stopPropagation(); remove(${i.id})">APAGAR</button>
                 </div>
             </div>`).join('');
@@ -256,37 +192,39 @@
             <img src="${i.bg}" class="modal-header-img">
             <div class="p-4 pt-0" style="margin-top:-60px; position:relative">
                 <div class="d-flex gap-4 align-items-end mb-4">
-                    <img src="${i.img}" style="width:130px; border-radius:18px; border:5px solid white; shadow:0 10px 20px rgba(0,0,0,0.2)">
+                    <img src="${i.img}" style="width:130px; border-radius:18px; border:5px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.1)">
                     <div class="pb-2">
                         <h3 class="fw-bold text-dark mb-1">${i.title}</h3>
-                        <a href="https://www.youtube.com/results?search_query=${i.title} trailer" target="_blank" class="btn-youtube">Trailer YouTube</a>
+                        <a href="https://www.youtube.com/results?search_query=${i.title} trailer" target="_blank" class="btn btn-sm btn-danger fw-bold rounded-pill px-3">YouTube</a>
                     </div>
                 </div>
                 ${i.type === 'tv' ? `<div class="bg-light p-3 rounded-4 mb-3 d-flex justify-content-between align-items-center border">
-                    <div class="fw-bold text-dark">Temporada ${i.temporada} | Episódio ${i.episodio}</div>
-                    <div class="d-flex gap-2">
-                        <input type="number" class="form-control form-control-sm w-25" value="${i.episodio}" onchange="update(${i.id}, 'episodio', this.value)">
-                        <button class="btn btn-sm btn-warning fw-bold" onclick="nextEp(${i.id})">+1 Ep</button>
-                    </div>
+                    <div class="fw-bold">T: ${i.temporada} | E: ${i.episodio}</div>
+                    <button class="btn btn-sm btn-warning fw-bold" onclick="nextEp(${i.id})">+1 Ep</button>
                 </div>` : ''}
-                <p class="text-muted small">${i.desc}</p>
-                <div class="row g-2 mt-3">
-                    <div class="col-6">
-                        <label class="small fw-bold text-muted">STATUS</label>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="small fw-bold text-muted mb-1">STATUS</label>
                         <select class="form-select" onchange="update(${i.id}, 'status', this.value)">
                             <option ${i.status === 'Para Ver' ? 'selected' : ''}>Para Ver</option>
                             <option ${i.status === 'A Ver' ? 'selected' : ''}>A Ver</option>
                             <option ${i.status === 'Visto' ? 'selected' : ''}>Visto</option>
                         </select>
                     </div>
-                    <div class="col-6">
-                        <label class="small fw-bold text-muted">PASTA</label>
-                        <select class="form-select" onchange="update(${i.id}, 'folder', this.value)">
-                            <option value="Nenhuma">Mover...</option>
-                            ${folders.map(f => `<option value="${f}" ${i.folder === f ? 'selected' : ''}>${f}</option>`).join('')}
-                        </select>
+                    <div class="col-md-6">
+                        <label class="small fw-bold text-muted mb-1">PERTENCE ÀS PASTAS:</label>
+                        <div class="folder-check-list">
+                            ${folders.map(f => `
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="${f}" id="f-${f}" 
+                                    ${(i.folders || []).includes(f) ? 'checked' : ''} 
+                                    onchange="toggleFolder(${i.id}, '${f}')">
+                                    <label class="form-check-label small" for="f-${f}">${f}</label>
+                                </div>`).join('')}
+                        </div>
                     </div>
                 </div>
+                <p class="text-muted small">${i.desc}</p>
                 <h6 class="mt-4 fw-bold text-dark">RECOMENDAÇÕES / SAGA</h6>
                 <div class="scroll-row">
                     ${i.recs.map(r => `<div class="text-center" style="width:90px; cursor:pointer" onclick="add(${r.id}, '${i.type}')"><img src="https://image.tmdb.org/t/p/w200${r.poster_path}" class="rounded-3 w-100 mb-1"><div style="font-size:0.6rem; font-weight:bold" class="text-truncate">${r.title || r.name}</div></div>`).join('')}
@@ -295,15 +233,26 @@
         new bootstrap.Modal(document.getElementById('win')).show();
     }
 
+    function toggleFolder(id, folderName) {
+        const i = db.find(x => x.id === id);
+        if(!i.folders) i.folders = [];
+        if(i.folders.includes(folderName)) {
+            i.folders = i.folders.filter(f => f !== folderName);
+        } else {
+            i.folders.push(folderName);
+        }
+        save();
+    }
+
     function remove(id) { const idx = db.findIndex(x => x.id === id); historyStack.push({...db[idx]}); db.splice(idx, 1); save(); showUndo(); }
     function showUndo() { const b = document.getElementById('undoBanner'); b.style.display = 'block'; setTimeout(() => b.style.display = 'none', 6000); }
     function undo() { if(historyStack.length) { db.unshift(historyStack.pop()); save(); } document.getElementById('undoBanner').style.display = 'none'; }
     function update(id, k, v) { const i = db.find(x => x.id === id); if(i) { i[k] = v; save(); } }
     function nextEp(id) { const i = db.find(x => x.id === id); i.episodio++; save(); openModal(id); }
-    function newFolder() { const n = prompt("Nome da nova pasta:"); if(n) { folders.push(n); save(); } }
-    function deleteFolder(name) { if(confirm(`Remover pasta "${name}"?`)) { folders = folders.filter(f => f !== name); db.forEach(i => { if(i.folder === name) i.folder = 'Nenhuma'; }); save(); } }
+    function newFolder() { const n = prompt("Nome da pasta:"); if(n) { folders.push(n); save(); } }
+    function deleteFolder(name) { if(confirm(`Remover pasta "${name}"?`)) { folders = folders.filter(f => f !== name); db.forEach(i => { if(i.folders) i.folders = i.folders.filter(fn => fn !== name); }); save(); } }
     function pickRandom() { if(db.length > 0) { const r = db[Math.floor(Math.random()*db.length)]; openModal(r.id); } }
-    function exportJSON() { const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const a = document.createElement('a'); a.href = data; a.download = "cinetrack_gold_backup.json"; a.click(); }
+    function exportJSON() { const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const a = document.createElement('a'); a.href = data; a.download = "cinetrack_multi_backup.json"; a.click(); }
 
     window.onload = () => { render(); renderFolderBar(); renderGenreBar(); };
 </script>
