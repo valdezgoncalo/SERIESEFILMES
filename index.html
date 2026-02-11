@@ -456,26 +456,35 @@
         const q = document.getElementById('term').value;
         const box = document.getElementById('suggestions');
         if(q.length < 2) { box.style.display = 'none'; return; }
-        const r = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEY}&query=${q}&language=pt-PT`);
+        
+        const r = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEY}&query=${encodeURIComponent(q)}&language=pt-PT`);
         const d = await r.json();
-        box.innerHTML = d.results.filter(i => i.media_type !== 'person').slice(0,5).map(i => `
-            <div class="suggestion-item" onclick="add(${i.id}, '${i.media_type}')">
-                <img src="https://image.tmdb.org/t/p/w92${i.poster_path}" style="width:35px; border-radius:6px;">
-                <div class="fw-bold text-dark">${i.title || i.name}</div>
-            </div>`).join('');
+        
+        // CORREÇÃO: Usar onmousedown para evitar que o fechamento do modal cancele o clique
+        box.innerHTML = d.results
+            .filter(i => i.media_type !== 'person')
+            .slice(0,6)
+            .map(i => `
+                <div class="suggestion-item" onmousedown="add(${i.id}, '${i.media_type}')">
+                    <img src="${i.poster_path ? 'https://image.tmdb.org/t/p/w92'+i.poster_path : 'https://via.placeholder.com/92x138'}" style="width:35px; border-radius:6px;">
+                    <div class="fw-bold text-dark">${i.title || i.name}</div>
+                </div>`).join('');
         box.style.display = 'block';
     }
 
     async function add(id, type) {
         document.getElementById('suggestions').style.display = 'none';
         document.getElementById('term').value = '';
+        
+        if(db.some(x => x.id === id)) return;
+
         const r = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${KEY}&language=pt-PT&append_to_response=recommendations`);
         const i = await r.json();
-        if(db.some(x => x.id === i.id)) return;
+        
         db.unshift({
             id: i.id, type: type, title: i.title || i.name,
-            img: `https://image.tmdb.org/t/p/w500${i.poster_path}`,
-            bg: `https://image.tmdb.org/t/p/original${i.backdrop_path}`,
+            img: i.poster_path ? `https://image.tmdb.org/t/p/w500${i.poster_path}` : 'https://via.placeholder.com/500x750',
+            bg: i.backdrop_path ? `https://image.tmdb.org/t/p/original${i.backdrop_path}` : 'https://via.placeholder.com/1280x720',
             desc: i.overview || "Sem sinopse disponível.",
             score: i.vote_average ? i.vote_average.toFixed(1) : '?',
             genres: i.genres?.map(g => g.name) || [],
@@ -598,7 +607,8 @@
     function exportJSON() { const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({db, folders})); const a = document.createElement('a'); a.href = data; a.download = "cinetrack_gold_backup.json"; a.click(); }
     function importJSON(input) { const reader = new FileReader(); reader.onload = (e) => { try { const data = JSON.parse(e.target.result); db = data.db || data; folders = data.folders || folders; save(); alert("✅ Dados importados!"); } catch(err) { alert("Erro ao importar!"); } }; reader.readAsText(input.files[0]); }
 
-    document.addEventListener('click', (e) => {
+    // Evento de fechamento de sugestões corrigido
+    document.addEventListener('mousedown', (e) => {
         const term = document.getElementById('term');
         const sugg = document.getElementById('suggestions');
         if(!term.contains(e.target) && !sugg.contains(e.target)) {
