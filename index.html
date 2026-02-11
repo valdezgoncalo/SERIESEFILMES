@@ -3,83 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineTrack PRO - Final Edition</title>
+    <title>CineTrack Pro - Cinema Edition</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root { 
             --bg-deep: #020617; --bg-card: #1e293b; --accent: #38bdf8; 
             --star: #fbbf24; --text-main: #ffffff; --text-dim: #cbd5e1; --tmdb-green: #4ade80;
-            --youtube-red: #ff0000; --progress-bg: #334155;
+            --youtube: #ff0000;
         }
 
         body { background-color: var(--bg-deep); color: var(--text-main); font-family: 'Inter', sans-serif; padding-bottom: 50px; }
 
+        /* HEADER & STATS */
         .stats-bar { background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 25px; display: flex; justify-content: space-around; }
         .stat-val { display: block; font-size: 1.2rem; font-weight: 800; color: var(--accent); text-align: center;}
         .stat-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-dim); }
 
-        .search-container { display: flex; gap: 10px; max-width: 650px; margin: 0 auto 15px; position: relative; }
+        /* SEARCH & FOLDERS */
+        .search-box { position: relative; max-width: 650px; margin: 0 auto 15px; }
         .form-control-lg { background: #0f172a !important; border: 2px solid #334155 !important; color: white !important; border-radius: 15px; }
-        
         #suggestions { position: absolute; width: 100%; background: #1e293b; border: 1px solid var(--accent); border-radius: 10px; display: none; z-index: 2000; margin-top: 5px; max-height: 300px; overflow-y: auto; }
-        .btn-random { background: var(--star); color: #020617; border: none; border-radius: 15px; padding: 0 20px; font-weight: 800; font-size: 1.2rem; transition: 0.2s; }
-        .btn-random:active { transform: scale(0.9); }
-
-        .scroll-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; margin-bottom: 10px; scrollbar-width: none; align-items: center; }
-        .scroll-row::-webkit-scrollbar { display: none; }
         
-        .btn-tool { background: #1e293b; color: white; border: 1px solid #334155; border-radius: 10px; padding: 6px 15px; font-size: 0.85rem; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
+        .controls-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 10px; }
+        .folder-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 25px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 15px; }
+        
+        .btn-tool { background: #1e293b; color: white; border: 1px solid #334155; border-radius: 10px; padding: 6px 15px; font-size: 0.85rem; transition: 0.3s; }
         .btn-tool.active { background: var(--accent); color: #020617; font-weight: bold; }
+
+        /* FOLDERS WITH DELETE */
+        .folder-group { display: flex; align-items: center; background: #1e293b; border-radius: 8px; border: 1px solid #334155; }
+        .folder-group.active { border-color: var(--accent); background: rgba(56, 189, 248, 0.1); }
+        .btn-folder-name { background: transparent; color: var(--text-dim); border: none; padding: 4px 10px; font-size: 0.75rem; font-weight: 600; }
+        .btn-folder-del { background: transparent; border: none; color: #ef4444; padding: 0 8px; font-size: 0.7rem; opacity: 0.5; border-left: 1px solid #334155; }
+
+        /* GRID/LIST */
+        #myList.grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 20px; }
+        .m-card { background: var(--bg-card); border-radius: 15px; padding: 12px; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s ease; cursor: pointer; display: flex; position: relative; }
+        .m-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+        .card-title { font-size: 1.1rem; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* MODAL & VIDEO */
+        .modal-content { background: #0f172a; border-radius: 24px; border: 1px solid #334155; overflow: hidden; }
+        .backdrop-img { width: 100%; height: 350px; object-fit: cover; mask-image: linear-gradient(to bottom, black 50%, transparent 100%); }
+        .modal-body { padding: 0 30px 30px; margin-top: -100px; position: relative; }
+        .poster-main { width: 140px; border-radius: 15px; border: 4px solid #0f172a; box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
         
-        .btn-genre { background: transparent; color: var(--text-dim); border: 1px solid #334155; border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; white-space: nowrap; }
-        .btn-genre.active { background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent); }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 15px; margin-top: 20px; border: 1px solid #334155; display: none; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-        #myList.grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
-        .m-card { background: var(--bg-card); border-radius: 15px; padding: 12px; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s ease; cursor: pointer; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-        .m-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; }
+        .btn-trailer { background: var(--youtube); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-trailer:hover { background: #cc0000; }
 
-        .modal-content { background: #0f172a; border-radius: 24px; border: 1px solid #334155; overflow-y: auto; max-height: 90vh; }
-        .backdrop-img { width: 100%; height: 250px; object-fit: cover; mask-image: linear-gradient(to bottom, black 50%, transparent 100%); }
-        .modal-body { padding: 0 30px 30px; margin-top: -60px; position: relative; }
-        .poster-main { width: 120px; border-radius: 15px; border: 4px solid #0f172a; }
+        .saga-list { display: flex; gap: 12px; overflow-x: auto; padding: 10px 0; }
+        .saga-item { flex: 0 0 90px; text-align: center; cursor: pointer; }
+        .saga-img { width: 90px; height: 130px; border-radius: 8px; object-fit: cover; }
 
-        .recommend-card { width: 100px; flex-shrink: 0; cursor: pointer; }
-        .recommend-card img { width: 100%; border-radius: 8px; }
-        
-        #undoBanner { display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #020617; padding: 12px 25px; border-radius: 15px; font-weight: 800; z-index: 5000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        /* UTILS */
+        .history-pane { background: rgba(15, 23, 42, 0.95); border-left: 1px solid #334155; height: 100vh; position: fixed; right: -300px; top: 0; width: 300px; z-index: 4000; transition: 0.4s; padding: 20px; backdrop-filter: blur(10px); }
+        .history-pane.open { right: 0; }
+        #undoBanner { display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #020617; padding: 12px 25px; border-radius: 15px; font-weight: 800; z-index: 5000; }
+        .type-badge { background: rgba(56, 189, 248, 0.2); color: var(--accent); padding: 2px 6px; border-radius: 5px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
+        .folder-badge { background: #334155; color: #94a3b8; padding: 2px 8px; border-radius: 4px; font-size: 0.6rem; margin-top: 4px; display: inline-block; }
     </style>
 </head>
 <body>
 
-<div id="undoBanner">Item removido <button class="btn btn-sm btn-dark ms-2 rounded-pill fw-bold" onclick="undo()">DESFAZER</button></div>
+<div id="undoBanner">REMOVIDO <button class="btn btn-sm btn-dark ms-2 rounded-pill fw-bold" onclick="undo()">DESFAZER</button></div>
+
+<div class="history-pane shadow-lg" id="histPane">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="m-0 fw-bold">Atividade</h5>
+        <button class="btn-close btn-close-white" onclick="toggleHist()"></button>
+    </div>
+    <div id="histContent" style="max-height: 85vh; overflow-y: auto;"></div>
+</div>
 
 <div class="container py-4">
     <header class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold m-0"><span style="color:var(--accent)">Cine</span>Track</h2>
-        <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="exportJSON()">Exportar Backup</button>
+        <h2 class="fw-bold m-0"><span style="color:var(--accent)">Cine</span>Track PRO</h2>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-info rounded-pill" onclick="toggleHist()">Histórico</button>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="exportJSON()">Exportar</button>
+            <label class="btn btn-sm btn-outline-secondary rounded-pill m-0" for="importFile">Importar</label>
+            <input type="file" id="importFile" style="display:none" onchange="importJSON(this)">
+        </div>
     </header>
 
     <div class="stats-bar" id="statsArea"></div>
 
-    <div class="search-container">
-        <input type="text" id="term" class="form-control form-control-lg" placeholder="Pesquisar filme ou série..." onkeyup="search()">
-        <button class="btn-random" onclick="pickRandom()" title="Escolha Aleatória">🎲</button>
+    <div class="search-box">
+        <input type="text" id="term" class="form-control form-control-lg" placeholder="Adicionar Filme ou Série..." onkeyup="search()">
         <div id="suggestions"></div>
     </div>
 
-    <div class="scroll-row justify-content-center mb-3">
+    <div class="controls-row">
         <button class="btn-tool active" id="btn-all" onclick="setFilter('all')">Tudo</button>
         <button class="btn-tool" id="btn-movie" onclick="setFilter('movie')">Filmes</button>
         <button class="btn-tool" id="btn-tv" onclick="setFilter('tv')">Séries</button>
+        <select class="btn-tool" onchange="setSort(this.value)">
+            <option value="recent">Recentes</option>
+            <option value="score">Melhor TMDB</option>
+            <option value="alpha">A-Z</option>
+        </select>
+        <button class="btn-tool" id="toggleView" onclick="toggleView()">Visualização</button>
     </div>
 
-    <div class="scroll-row" id="folderBar"></div>
-    <div class="scroll-row" id="genreBar"></div>
+    <div class="folder-row" id="folderBar"></div>
 
-    <div id="myList" class="grid-view"></div>
+    <div id="myList" class="row justify-content-center"></div>
 </div>
 
-<div class="modal fade" id="win" tabindex="-1">
+<div class="modal fade" id="win" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content" id="winContent"></div>
     </div>
@@ -89,18 +123,27 @@
 
 <script>
     const KEY = '8661bff51991b4bcd2a9a9e9fa66b639';
-    const DB_NAME = 'cinetrack_production_v1';
-    const FL_NAME = 'cinetrack_folders_v1';
-
-    let db = JSON.parse(localStorage.getItem(DB_NAME)) || [];
-    let folders = JSON.parse(localStorage.getItem(FL_NAME)) || ["Favoritos"];
+    let db = JSON.parse(localStorage.getItem('cine_ultimate_v13')) || [];
+    let folders = JSON.parse(localStorage.getItem('cine_folders_v13')) || ["Favoritos"];
     let historyStack = [];
-    let currentFilter = 'all', currentFolderFilter = 'all', currentGenreFilter = 'all';
+    let activityLog = JSON.parse(localStorage.getItem('cine_log_v13')) || [];
+    let currentFilter = 'all';
+    let currentFolderFilter = 'all';
+    let currentSort = 'recent';
+    let isGridView = false;
+
+    function logAction(msg) {
+        const time = new Date().toLocaleTimeString();
+        activityLog.unshift(`[${time}] ${msg}`);
+        if(activityLog.length > 25) activityLog.pop();
+        localStorage.setItem('cine_log_v13', JSON.stringify(activityLog));
+        renderHistory();
+    }
 
     function save() { 
-        localStorage.setItem(DB_NAME, JSON.stringify(db)); 
-        localStorage.setItem(FL_NAME, JSON.stringify(folders));
-        render(); renderStats(); renderFolderBar(); renderGenreBar();
+        localStorage.setItem('cine_ultimate_v13', JSON.stringify(db)); 
+        localStorage.setItem('cine_folders_v13', JSON.stringify(folders));
+        render(); renderStats(); renderFolderBar();
     }
 
     async function search() {
@@ -109,10 +152,10 @@
         if(q.length < 2) { box.style.display = 'none'; return; }
         const r = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEY}&query=${q}&language=pt-PT`);
         const d = await r.json();
-        box.innerHTML = d.results.filter(i => i.media_type !== 'person').slice(0,5).map(i => `
+        box.innerHTML = d.results.filter(i => i.media_type !== 'person').slice(0,6).map(i => `
             <div class="p-3 border-bottom d-flex align-items-center" style="cursor:pointer" onclick="add(${i.id}, '${i.media_type}')">
-                <img src="https://image.tmdb.org/t/p/w92${i.poster_path}" style="width:30px; border-radius:4px; margin-right:15px">
-                <div class="fw-bold text-white">${i.title || i.name}</div>
+                <img src="https://image.tmdb.org/t/p/w92${i.poster_path}" style="width:35px; border-radius:4px; margin-right:15px">
+                <div class="flex-grow-1"><div class="fw-bold text-white">${i.title || i.name}</div><div class="small text-info text-uppercase">${i.media_type}</div></div>
             </div>`).join('');
         box.style.display = 'block';
     }
@@ -120,110 +163,150 @@
     async function add(id, type) {
         document.getElementById('suggestions').style.display = 'none';
         document.getElementById('term').value = '';
-        const r = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${KEY}&language=pt-PT&append_to_response=recommendations`);
+        if(db.find(x => x.id === id)) return;
+        const r = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${KEY}&append_to_response=recommendations&language=pt-PT`);
         const i = await r.json();
-        if(db.some(x => x.id === i.id)) return;
         db.unshift({
             id: i.id, type: type, title: i.title || i.name,
-            img: `https://image.tmdb.org/t/p/w500${i.poster_path}`,
-            bg: `https://image.tmdb.org/t/p/original${i.backdrop_path}`,
+            img: i.poster_path ? `https://image.tmdb.org/t/p/w500${i.poster_path}` : 'https://via.placeholder.com/500x750',
+            bg: i.backdrop_path ? `https://image.tmdb.org/t/p/original${i.backdrop_path}` : '',
             desc: i.overview || "Sem sinopse.",
             score: i.vote_average ? i.vote_average.toFixed(1) : '?',
-            genres: i.genres?.map(g => g.name) || [],
-            status: 'Para Ver', folder: 'Nenhuma',
-            temporada: 1, episodio: 1,
-            recs: i.recommendations?.results.slice(0, 6) || []
+            status: 'Para Ver', nota: 0, folder: 'Nenhuma',
+            related: i.recommendations?.results?.slice(0, 8).map(p => ({id: p.id, title: p.title || p.name, img: p.poster_path, type: type})) || [],
+            relatedTitle: i.belongs_to_collection ? `Saga: ${i.belongs_to_collection.name}` : "Recomendações"
         });
+        logAction(`Adicionado: ${i.title || i.name}`);
         save();
     }
 
-    function render() {
-        const container = document.getElementById('myList');
-        let list = db;
-        if(currentFilter !== 'all') list = list.filter(i => i.type === currentFilter);
-        if(currentFolderFilter !== 'all') list = list.filter(i => i.folder === currentFolderFilter);
-        if(currentGenreFilter !== 'all') list = list.filter(i => i.genres.includes(currentGenreFilter));
+    async function loadTrailer(id, type) {
+        const btn = document.querySelector('.btn-trailer');
+        btn.innerHTML = 'A carregar...';
+        const r = await fetch(`https://api.themoviedb.org/3/${type}/${id}/videos?api_key=${KEY}&language=pt-PT`);
+        let d = await r.json();
         
-        container.innerHTML = list.map(i => `
-            <div class="m-card" onclick="openModal(${i.id})">
-                <img src="${i.img}">
-                <div class="fw-bold small text-truncate text-white">${i.title}</div>
-                <div class="d-flex justify-content-between mt-1 align-items-center">
-                    <span style="color:var(--tmdb-green); font-size:0.75rem">⭐ ${i.score}</span>
-                    <button class="btn btn-sm p-0 text-danger opacity-75" style="font-size:0.7rem" onclick="event.stopPropagation(); remove(${i.id})">APAGAR</button>
-                </div>
-            </div>`).join('');
+        // Tenta PT-PT, se não houver tenta Inglês
+        if(d.results.length === 0) {
+            const r2 = await fetch(`https://api.themoviedb.org/3/${type}/${id}/videos?api_key=${KEY}`);
+            d = await r2.json();
+        }
+
+        const trailer = d.results.find(v => v.type === 'Trailer' && v.site === 'YouTube');
+        const container = document.getElementById('trailerContainer');
+
+        if(trailer) {
+            container.innerHTML = `<iframe src="https://www.youtube.com/embed/${trailer.key}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            container.style.display = 'block';
+            btn.style.display = 'none';
+        } else {
+            alert("Trailer não encontrado.");
+            btn.innerHTML = 'Trailer Indisponível';
+        }
+    }
+
+    function renderStats() {
+        const vistos = db.filter(i => i.status === 'Visto').length;
+        const total = db.length;
+        const media = db.filter(i => i.nota > 0).reduce((acc, curr) => acc + curr.nota, 0) / (db.filter(i => i.nota > 0).length || 1);
+        document.getElementById('statsArea').innerHTML = `<div><span class="stat-val">${total}</span><span class="stat-label">Total</span></div><div><span class="stat-val">${vistos}</span><span class="stat-label">Vistos</span></div><div><span class="stat-val">${media.toFixed(1)}</span><span class="stat-label">Média ⭐</span></div>`;
     }
 
     function renderFolderBar() {
         const bar = document.getElementById('folderBar');
-        bar.innerHTML = `<button class="btn-tool ${currentFolderFilter === 'all' ? 'active' : ''}" onclick="setFolderFilter('all')">Tudo</button>` + 
-            folders.map(f => `
-                <div class="btn-tool ${currentFolderFilter === f ? 'active' : ''}">
-                    <span onclick="setFolderFilter('${f}')">${f}</span>
-                    <small class="ms-2 text-danger fw-bold" style="cursor:pointer" onclick="deleteFolder('${f}')">✕</small>
-                </div>`).join('') +
-            `<button class="btn btn-sm btn-outline-info ms-2" onclick="newFolder()">+ Pasta</button>`;
+        let html = `<div class="folder-group ${currentFolderFilter === 'all' ? 'active' : ''}"><button class="btn-folder-name" onclick="setFolderFilter('all')">Tudo</button></div>`;
+        folders.forEach(f => {
+            html += `<div class="folder-group ${currentFolderFilter === f ? 'active' : ''}"><button class="btn-folder-name" onclick="setFolderFilter('${f}')">${f}</button><button class="btn-folder-del" onclick="deleteFolder('${f}')">✕</button></div>`;
+        });
+        html += `<button class="btn-tool ms-2" style="border-style:dashed" onclick="newFolder()">+ Pasta</button>`;
+        bar.innerHTML = html;
     }
 
-    function renderGenreBar() {
-        const bar = document.getElementById('genreBar');
-        const all = [...new Set(db.flatMap(i => i.genres))].sort();
-        bar.innerHTML = `<button class="btn-genre ${currentGenreFilter === 'all' ? 'active' : ''}" onclick="setGenreFilter('all')">Todos</button>` + 
-            all.map(g => `<button class="btn-genre ${currentGenreFilter === g ? 'active' : ''}" onclick="setGenreFilter('${g}')">${g}</button>`).join('');
+    function render() {
+        const container = document.getElementById('myList');
+        if(isGridView) container.classList.add('grid-view'); else container.classList.remove('grid-view');
+
+        let list = db;
+        if(currentFilter !== 'all') list = list.filter(i => i.type === currentFilter);
+        if(currentFolderFilter !== 'all') list = list.filter(i => i.folder === currentFolderFilter);
+        if(currentSort === 'score') list.sort((a,b) => b.score - a.score);
+        if(currentSort === 'alpha') list.sort((a,b) => a.title.localeCompare(b.title));
+
+        container.innerHTML = list.map(i => `
+            <div class="${isGridView ? '' : 'col-12 col-md-10 mb-2'}">
+                <div class="m-card" onclick="openModal(${i.id})">
+                    <img src="${i.img}" style="width:60px; height:85px; object-fit:cover; border-radius:10px; margin-right:20px">
+                    <div class="flex-grow-1 overflow-hidden">
+                        <div class="card-title">${i.title}</div>
+                        <div class="d-flex align-items-center gap-2 mt-1">
+                            <span class="type-badge">${i.type === 'tv' ? 'Série' : 'Filme'}</span>
+                            <span style="color:var(--tmdb-green); font-weight:bold;">⭐ ${i.score}</span>
+                            ${i.folder !== 'Nenhuma' ? `<span class="folder-badge">${i.folder}</span>` : ''}
+                        </div>
+                    </div>
+                    <button class="btn text-danger opacity-50" onclick="event.stopPropagation(); remove(${i.id})">✕</button>
+                </div>
+            </div>`).join('');
     }
 
     function openModal(id) {
         const i = db.find(x => x.id === id);
-        if(!i) return;
         const win = document.getElementById('winContent');
         win.innerHTML = `
-            <div class="position-relative"><img src="${i.bg}" class="backdrop-img"></div>
+            <div class="position-relative"><img src="${i.bg}" class="backdrop-img"><button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4" data-bs-dismiss="modal"></button></div>
             <div class="modal-body">
-                <div class="d-flex gap-3 align-items-end mb-4">
-                    <img src="${i.img}" class="poster-main shadow">
-                    <div>
-                        <h4 class="fw-bold text-white mb-2">${i.title}</h4>
-                        <a href="https://www.youtube.com/results?search_query=${i.title} trailer" target="_blank" class="btn btn-sm btn-danger fw-bold">YouTube</a>
+                <div class="d-flex gap-4 align-items-end mb-4">
+                    <img src="${i.img}" class="poster-main">
+                    <div class="flex-grow-1">
+                        <h2 class="fw-bold text-white mb-2">${i.title}</h2>
+                        <div class="d-flex gap-2 align-items-center">
+                            <span class="type-badge">${i.type}</span>
+                            <span class="badge bg-dark text-warning">⭐ ${i.score}</span>
+                        </div>
+                        <button class="btn-trailer" onclick="loadTrailer(${i.id}, '${i.type}')">▶ Ver Trailer Oficial</button>
                     </div>
                 </div>
-                ${i.type === 'tv' ? `<div class="bg-dark p-3 rounded-3 mb-3 d-flex justify-content-between align-items-center border border-secondary">
-                    <div class="d-flex gap-2">
-                         <span>T: <input type="number" class="bg-transparent text-white border-0 w-25" value="${i.temporada}" onchange="update(${i.id}, 'temporada', this.value)"></span>
-                         <span>E: <input type="number" class="bg-transparent text-white border-0 w-25" value="${i.episodio}" onchange="update(${i.id}, 'episodio', this.value)"></span>
+                <div id="trailerContainer" class="video-container"></div>
+                <p class="mt-4" style="color:#e2e8f0; font-size:0.9rem">${i.desc}</p>
+                <div class="row g-2 mt-3 bg-dark p-3 rounded-4">
+                    <div class="col-4"><label class="small text-muted d-block mb-1 fw-bold text-uppercase" style="font-size:0.6rem">Estado</label>
+                        <select class="form-select bg-dark text-white border-0 fw-bold p-0" onchange="update(${i.id}, 'status', this.value)">
+                            <option ${i.status === 'Para Ver' ? 'selected' : ''}>Para Ver</option><option ${i.status === 'Visto' ? 'selected' : ''}>Visto</option>
+                        </select>
                     </div>
-                    <button class="btn btn-sm btn-info fw-bold" onclick="nextEp(${i.id})">+1 Ep</button>
-                </div>` : ''}
-                <p class="small text-dim">${i.desc}</p>
-                
-                <h6 class="mt-4 text-accent fw-bold">Sugestões / Saga:</h6>
-                <div class="d-flex gap-2 overflow-x-auto pb-2">
-                    ${i.recs.map(r => `<div class="recommend-card" onclick="add(${r.id}, '${i.type}')"><img src="https://image.tmdb.org/t/p/w200${r.poster_path}"><div class="small text-truncate mt-1">${r.title || r.name}</div></div>`).join('')}
+                    <div class="col-4 border-start border-secondary"><label class="small text-muted d-block mb-1 fw-bold text-uppercase" style="font-size:0.6rem">Nota</label>
+                        <select class="form-select bg-dark text-warning border-0 fw-bold p-0" onchange="update(${i.id}, 'nota', this.value)">
+                            ${[0,1,2,3,4,5].map(n => `<option value="${n}" ${i.nota == n ? 'selected' : ''}>${n} Estrelas</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="col-4 border-start border-secondary"><label class="small text-muted d-block mb-1 fw-bold text-uppercase" style="font-size:0.6rem">Pasta</label>
+                        <select class="form-select bg-dark text-info border-0 fw-bold p-0" onchange="update(${i.id}, 'folder', this.value)">
+                            <option value="Nenhuma">Nenhuma</option>
+                            ${folders.map(f => `<option value="${f}" ${i.folder === f ? 'selected' : ''}>${f}</option>`).join('')}
+                        </select>
+                    </div>
                 </div>
-
-                <div class="row g-2 mt-3">
-                    <div class="col-6"><select class="form-select bg-dark text-white border-secondary" onchange="update(${i.id}, 'status', this.value)"><option ${i.status === 'Para Ver' ? 'selected' : ''}>Para Ver</option><option ${i.status === 'Visto' ? 'selected' : ''}>Visto</option></select></div>
-                    <div class="col-6"><select class="form-select bg-dark text-info border-secondary" onchange="update(${i.id}, 'folder', this.value)"><option value="Nenhuma">Mover para...</option>${folders.map(f => `<option value="${f}" ${i.folder === f ? 'selected' : ''}>${f}</option>`).join('')}</select></div>
-                </div>
+                ${i.related.length > 0 ? `<h6 class="fw-bold text-muted small mt-4 mb-2 text-uppercase" style="font-size:0.6rem">${i.relatedTitle}</h6><div class="saga-list">${i.related.map(r => `<div class="saga-item" onclick="add(${r.id}, '${r.type}')" data-bs-dismiss="modal"><img src="https://image.tmdb.org/t/p/w185${r.img}" class="saga-img shadow-lg"><div style="font-size:0.6rem; margin-top:5px" class="text-truncate">${r.title}</div></div>`).join('')}</div>` : ''}
             </div>`;
         new bootstrap.Modal(document.getElementById('win')).show();
     }
 
-    function deleteFolder(name) { if(confirm(`Apagar a pasta "${name}"?`)) { folders = folders.filter(f => f !== name); db.forEach(i => { if(i.folder === name) i.folder = 'Nenhuma'; }); save(); } }
-    function remove(id) { const idx = db.findIndex(x => x.id === id); historyStack.push({...db[idx]}); db.splice(idx, 1); save(); showUndo(); }
-    function showUndo() { const b = document.getElementById('undoBanner'); b.style.display = 'block'; setTimeout(() => b.style.display = 'none', 5000); }
-    function undo() { if(historyStack.length) { db.unshift(historyStack.pop()); save(); } document.getElementById('undoBanner').style.display = 'none'; }
-    function setFilter(f) { currentFilter = f; document.querySelectorAll('.btn-tool').forEach(b => b.classList.remove('active')); if(document.getElementById('btn-'+f)) document.getElementById('btn-'+f).classList.add('active'); render(); }
+    /* SISTEMA DE PASTAS & UTILS (MANTIDOS) */
+    function newFolder() { const name = prompt("Nome da nova pasta:"); if(name && !folders.includes(name)) { folders.push(name); logAction(`Criada pasta: ${name}`); save(); } }
+    function deleteFolder(name) { if(confirm(`Eliminar a pasta "${name}"?`)) { db.forEach(i => { if(i.folder === name) i.folder = 'Nenhuma'; }); folders = folders.filter(f => f !== name); if(currentFolderFilter === name) currentFolderFilter = 'all'; logAction(`Eliminada pasta: ${name}`); save(); } }
     function setFolderFilter(f) { currentFolderFilter = f; render(); renderFolderBar(); }
-    function setGenreFilter(g) { currentGenreFilter = g; render(); renderGenreBar(); }
-    function newFolder() { const n = prompt("Nome da pasta:"); if(n) { folders.push(n); save(); } }
-    function update(id, k, v) { const i = db.find(x => x.id === id); if(i) { i[k] = v; save(); } }
-    function nextEp(id) { const i = db.find(x => x.id === id); i.episodio++; save(); openModal(id); }
-    function renderStats() { document.getElementById('statsArea').innerHTML = `<div><span class="stat-val">${db.length}</span><span class="stat-label">Total</span></div><div><span class="stat-val">${db.filter(x=>x.status==='Visto').length}</span><span class="stat-label">Vistos</span></div>`; }
-    function pickRandom() { if(db.length > 0) { const r = db[Math.floor(Math.random()*db.length)]; openModal(r.id); } }
-    function exportJSON() { const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const a = document.createElement('a'); a.href = data; a.download = "cinetrack_backup.json"; a.click(); }
-    
-    window.onload = () => { render(); renderStats(); renderFolderBar(); renderGenreBar(); };
+    function setFilter(f) { currentFilter = f; document.querySelectorAll('.btn-tool').forEach(b => b.classList.remove('active')); document.getElementById('btn-'+f).classList.add('active'); render(); }
+    function setSort(s) { currentSort = s; render(); }
+    function toggleView() { isGridView = !isGridView; render(); }
+    function toggleHist() { document.getElementById('histPane').classList.toggle('open'); }
+    function renderHistory() { document.getElementById('histContent').innerHTML = activityLog.map(l => `<div class="history-item" style="font-size:0.7rem; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.05)">${l}</div>`).join(''); }
+    function update(id, key, val) { const i = db.find(x => x.id === id); i[key] = key === 'nota' ? parseInt(val) : val; logAction(`Alterado: ${i.title} (${key})`); save(); }
+    function remove(id) { const idx = db.findIndex(x => x.id === id); historyStack.push(db[idx]); logAction(`Removido: ${db[idx].title}`); db.splice(idx, 1); save(); document.getElementById('undoBanner').style.display = 'block'; setTimeout(() => document.getElementById('undoBanner').style.display = 'none', 8000); }
+    function undo() { if(historyStack.length) { const item = historyStack.pop(); db.unshift(item); logAction(`Restaurado: ${item.title}`); save(); } document.getElementById('undoBanner').style.display = 'none'; }
+    function exportJSON() { const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({db, folders})); const a = document.createElement('a'); a.href = data; a.download = "cinetrack_v13.json"; a.click(); }
+    function importJSON(input) { const reader = new FileReader(); reader.onload = (e) => { try { const data = JSON.parse(e.target.result); db = data.db || data; folders = data.folders || folders; save(); alert("Dados importados!"); } catch(err) { alert("Erro!"); } }; reader.readAsText(input.files[0]); }
+
+    window.onload = () => { render(); renderStats(); renderHistory(); renderFolderBar(); };
 </script>
 </body>
 </html>
