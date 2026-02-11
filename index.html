@@ -2,131 +2,125 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineTrack PRO - Ultimate Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CineTrack PRO - Universal Edition</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root { 
             --bg-deep: #020617; --bg-card: #1e293b; --accent: #38bdf8; 
             --star: #fbbf24; --text-main: #ffffff; --text-dim: #cbd5e1; --tmdb-green: #4ade80;
-            --youtube: #ff0000; --progress-bg: #334155; --streaming-bg: rgba(255,255,255,0.05);
+            --youtube: #ff0000; --progress-bg: #334155;
         }
 
-        body { background-color: var(--bg-deep); color: var(--text-main); font-family: 'Inter', sans-serif; padding-bottom: 50px; }
+        body { background-color: var(--bg-deep); color: var(--text-main); font-family: 'Inter', sans-serif; padding-bottom: 80px; overflow-x: hidden; }
+
+        /* Layout Responsivo para a Lista */
+        #myList { 
+            display: grid; 
+            gap: 15px; 
+            padding: 10px;
+            grid-template-columns: repeat(2, 1fr); /* Telemóvel: 2 colunas */
+        }
+        @media (min-width: 768px) { #myList { grid-template-columns: repeat(3, 1fr); } } /* Tablet: 3 */
+        @media (min-width: 1024px) { #myList { grid-template-columns: repeat(5, 1fr); } } /* PC: 5 ou 6 */
 
         .stats-bar { background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.1); border-radius: 15px; padding: 15px; margin-bottom: 25px; display: flex; justify-content: space-around; }
-        .stat-val { display: block; font-size: 1.2rem; font-weight: 800; color: var(--accent); text-align: center;}
-        .stat-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-dim); }
+        .stat-val { display: block; font-size: 1.1rem; font-weight: 800; color: var(--accent); text-align: center;}
+        .stat-label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-dim); }
 
-        .search-container { display: flex; gap: 10px; max-width: 650px; margin: 0 auto 15px; position: relative; }
-        .search-box { flex-grow: 1; position: relative; }
-        .form-control-lg { background: #0f172a !important; border: 2px solid #334155 !important; color: white !important; border-radius: 15px; }
+        .search-container { display: flex; gap: 8px; width: 100%; max-width: 650px; margin: 0 auto 15px; }
+        .form-control-lg { background: #0f172a !important; border: 2px solid #334155 !important; color: white !important; border-radius: 12px; font-size: 1rem; }
         
-        #suggestions { position: absolute; width: 100%; background: #1e293b; border: 1px solid var(--accent); border-radius: 10px; display: none; z-index: 2000; margin-top: 5px; max-height: 300px; overflow-y: auto; }
-        .btn-random { background: var(--star); color: #020617; border: none; border-radius: 15px; padding: 0 20px; font-weight: 800; font-size: 1.2rem; transition: 0.3s; }
+        #suggestions { position: absolute; width: calc(100% - 20px); left: 10px; background: #1e293b; border-radius: 12px; display: none; z-index: 2000; max-height: 250px; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
-        .controls-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 10px; }
-        .folder-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 10px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 15px; }
-        .genre-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-bottom: 25px; }
-        
-        .btn-tool { background: #1e293b; color: white; border: 1px solid #334155; border-radius: 10px; padding: 6px 15px; font-size: 0.85rem; }
-        .btn-tool.active { background: var(--accent); color: #020617; font-weight: bold; }
-        
-        .folder-group { display: flex; align-items: center; background: #1e293b; border-radius: 8px; border: 1px solid #334155; }
-        .folder-group.active { border-color: var(--accent); background: rgba(56, 189, 248, 0.1); }
-        .btn-folder-name { background: transparent; color: var(--text-dim); border: none; padding: 4px 10px; font-size: 0.75rem; font-weight: 600; }
-        .btn-folder-del { background: transparent; border: none; color: #ef4444; padding: 0 8px; font-size: 0.7rem; opacity: 0.5; border-left: 1px solid #334155; }
+        /* Cards em estilo vertical para Mobile */
+        .m-card { background: var(--bg-card); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; display: flex; flex-direction: column; transition: 0.2s; }
+        .m-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        .m-card-body { padding: 10px; }
+        .card-title { font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .btn-genre { background: transparent; color: var(--text-dim); border: 1px solid #334155; border-radius: 20px; padding: 2px 12px; font-size: 0.7rem; }
+        .card-progress-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--progress-bg); }
+        .card-progress-fill { height: 100%; background: var(--accent); }
+
+        .btn-del-mini { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+
+        /* Barras de Filtros (Scroll horizontal em mobile) */
+        .folder-row, .genre-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .folder-row::-webkit-scrollbar { display: none; }
+
+        .folder-group { display: flex; align-items: center; background: #1e293b; border-radius: 8px; border: 1px solid #334155; white-space: nowrap; }
+        .btn-genre { background: transparent; color: var(--text-dim); border: 1px solid #334155; border-radius: 20px; padding: 4px 15px; font-size: 0.75rem; white-space: nowrap; }
         .btn-genre.active { background: rgba(56, 189, 248, 0.2); border-color: var(--accent); color: var(--accent); }
 
-        #myList.grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 20px; }
-        .m-card { background: var(--bg-card); border-radius: 15px; padding: 12px; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s ease; cursor: pointer; display: flex; position: relative; overflow: hidden; }
-        .m-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+        /* Ajustes Modal Mobile */
+        .modal-body { padding: 15px 20px 25px; margin-top: -60px; position: relative; }
+        .backdrop-img { width: 100%; height: 220px; object-fit: cover; mask-image: linear-gradient(to bottom, black 40%, transparent 100%); }
+        .poster-main { width: 100px; border-radius: 12px; border: 3px solid #0f172a; margin-top: -40px; }
         
-        .card-progress-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--progress-bg); }
-        .card-progress-fill { height: 100%; background: var(--accent); transition: width 0.5s ease; }
+        .streaming-icon { width: 30px; height: 30px; border-radius: 6px; margin-right: 5px; }
 
-        .modal-content { background: #0f172a; border-radius: 24px; border: 1px solid #334155; overflow: hidden; }
-        .backdrop-img { width: 100%; height: 350px; object-fit: cover; mask-image: linear-gradient(to bottom, black 50%, transparent 100%); }
-        .modal-body { padding: 0 30px 30px; margin-top: -100px; position: relative; }
-        .poster-main { width: 140px; border-radius: 15px; border: 4px solid #0f172a; box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
-        
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 15px; margin-top: 20px; display: none; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        /* Painéis Laterais Responsivos */
+        .side-pane { background: rgba(15, 23, 42, 0.98); border-left: 1px solid #334155; height: 100vh; position: fixed; right: -100%; top: 0; width: 100%; max-width: 350px; z-index: 4000; transition: 0.4s; padding: 25px; backdrop-filter: blur(15px); }
+        .side-pane.open { right: 0; }
 
-        .streaming-icon { width: 35px; height: 35px; border-radius: 8px; margin-right: 8px; border: 1px solid rgba(255,255,255,0.1); }
-        
-        .history-pane, .calendar-pane { background: rgba(15, 23, 42, 0.98); border-left: 1px solid #334155; height: 100vh; position: fixed; right: -350px; top: 0; width: 350px; z-index: 4000; transition: 0.4s; padding: 25px; backdrop-filter: blur(15px); }
-        .history-pane.open, .calendar-pane.open { right: 0; }
-        
-        .calendar-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid var(--accent); }
-        
-        #undoBanner { display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #020617; padding: 12px 25px; border-radius: 15px; font-weight: 800; z-index: 5000; }
+        .btn-plus-ep { background: var(--accent); color: #020617; border: none; border-radius: 8px; font-weight: 800; padding: 5px 15px; }
+
+        #undoBanner { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; display:none; background: var(--accent); color: #020617; padding: 15px; border-radius: 15px; font-weight: 800; text-align: center; z-index: 5000; }
     </style>
 </head>
 <body>
 
-<div id="undoBanner">REMOVIDO <button class="btn btn-sm btn-dark ms-2 rounded-pill fw-bold" onclick="undo()">DESFAZER</button></div>
+<div id="undoBanner">REMOVIDO <button class="btn btn-sm btn-dark ms-2 fw-bold" onclick="undo()">DESFAZER</button></div>
 
-<div class="history-pane shadow-lg" id="histPane">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h5 class="m-0 fw-bold">Atividade</h5>
-        <button class="btn-close btn-close-white" onclick="togglePane('histPane')"></button>
-    </div>
-    <div id="histContent" style="max-height: 85vh; overflow-y: auto;"></div>
+<div class="side-pane shadow-lg" id="histPane">
+    <div class="d-flex justify-content-between align-items-center mb-4"><h5>Atividade</h5><button class="btn-close btn-close-white" onclick="togglePane('histPane')"></button></div>
+    <div id="histContent"></div>
 </div>
 
-<div class="calendar-pane shadow-lg" id="calPane">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h5 class="m-0 fw-bold">📅 Próximas Estreias</h5>
-        <button class="btn-close btn-close-white" onclick="togglePane('calPane')"></button>
-    </div>
-    <div id="calContent" style="max-height: 85vh; overflow-y: auto;"></div>
+<div class="side-pane shadow-lg" id="calPane">
+    <div class="d-flex justify-content-between align-items-center mb-4"><h5>📅 Estreias</h5><button class="btn-close btn-close-white" onclick="togglePane('calPane')"></button></div>
+    <div id="calContent"></div>
 </div>
 
-<div class="container py-4">
+<div class="container-fluid px-3 py-4">
     <header class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold m-0"><span style="color:var(--accent)">Cine</span>Track PRO</h2>
-        <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-warning rounded-pill fw-bold" onclick="updateCalendar()">Calendário</button>
-            <button class="btn btn-sm btn-outline-info rounded-pill" onclick="togglePane('histPane')">Histórico</button>
-            <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="exportJSON()">Exportar</button>
-            <label class="btn btn-sm btn-outline-secondary rounded-pill m-0" for="importFile">Importar</label>
-            <input type="file" id="importFile" style="display:none" onchange="importJSON(this)">
+        <h3 class="fw-bold m-0"><span style="color:var(--accent)">Cine</span>Track</h3>
+        <div class="d-flex gap-1">
+            <button class="btn btn-sm btn-warning" onclick="updateCalendar()">📅</button>
+            <button class="btn btn-sm btn-outline-info" onclick="togglePane('histPane')">🕒</button>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">⚙️</button>
+                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                    <li><button class="dropdown-item" onclick="exportJSON()">Exportar</button></li>
+                    <li><label class="dropdown-item" for="importFile">Importar</label></li>
+                </ul>
+                <input type="file" id="importFile" style="display:none" onchange="importJSON(this)">
+            </div>
         </div>
     </header>
 
     <div class="stats-bar" id="statsArea"></div>
 
-    <div class="search-container">
-        <div class="search-box">
-            <input type="text" id="term" class="form-control form-control-lg" placeholder="Adicionar Filme ou Série..." onkeyup="search()">
-            <div id="suggestions"></div>
-        </div>
-        <button class="btn-random" title="Sugerir aleatório" onclick="pickRandom()">🎲</button>
+    <div class="search-container position-relative">
+        <input type="text" id="term" class="form-control form-control-lg" placeholder="Adicionar Filme ou Série..." onkeyup="search()">
+        <button class="btn-random" onclick="pickRandom()">🎲</button>
+        <div id="suggestions"></div>
     </div>
 
-    <div class="controls-row">
+    <div class="folder-row mb-2" id="folderBar"></div>
+    <div class="genre-row mb-3" id="genreBar"></div>
+
+    <div class="d-flex justify-content-center gap-2 mb-4">
         <button class="btn-tool active" id="btn-all" onclick="setFilter('all')">Tudo</button>
         <button class="btn-tool" id="btn-movie" onclick="setFilter('movie')">Filmes</button>
         <button class="btn-tool" id="btn-tv" onclick="setFilter('tv')">Séries</button>
-        <select class="btn-tool" onchange="setSort(this.value)">
-            <option value="recent">Recentes</option>
-            <option value="score">Melhor TMDB</option>
-            <option value="alpha">A-Z</option>
-        </select>
-        <button class="btn-tool" onclick="toggleView()">Visualização</button>
     </div>
 
-    <div class="folder-row" id="folderBar"></div>
-    <div class="genre-row" id="genreBar"></div>
-
-    <div id="myList" class="row justify-content-center"></div>
+    <div id="myList"></div>
 </div>
 
 <div class="modal fade" id="win" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-fullscreen-sm-down">
         <div class="modal-content" id="winContent"></div>
     </div>
 </div>
@@ -135,19 +129,16 @@
 
 <script>
     const KEY = '8661bff51991b4bcd2a9a9e9fa66b639';
-    let db = JSON.parse(localStorage.getItem('cine_vUltimate')) || [];
-    let folders = JSON.parse(localStorage.getItem('folders_vUltimate')) || ["Favoritos"];
+    let db = JSON.parse(localStorage.getItem('cine_vMulti')) || [];
+    let folders = JSON.parse(localStorage.getItem('folders_vMulti')) || ["Favoritos"];
     let historyStack = [];
-    let activityLog = JSON.parse(localStorage.getItem('log_vUltimate')) || [];
     let currentFilter = 'all';
     let currentFolderFilter = 'all';
     let currentGenreFilter = 'all';
-    let currentSort = 'recent';
-    let isGridView = false;
 
     function save() { 
-        localStorage.setItem('cine_vUltimate', JSON.stringify(db)); 
-        localStorage.setItem('folders_vUltimate', JSON.stringify(folders));
+        localStorage.setItem('cine_vMulti', JSON.stringify(db)); 
+        localStorage.setItem('folders_vMulti', JSON.stringify(folders));
         render(); renderStats(); renderFolderBar(); renderGenreBar();
     }
 
@@ -160,7 +151,7 @@
         box.innerHTML = d.results.filter(i => i.media_type !== 'person').slice(0,6).map(i => `
             <div class="p-3 border-bottom d-flex align-items-center" style="cursor:pointer" onclick="add(${i.id}, '${i.media_type}')">
                 <img src="https://image.tmdb.org/t/p/w92${i.poster_path}" style="width:35px; border-radius:4px; margin-right:15px">
-                <div class="flex-grow-1"><div class="fw-bold text-white">${i.title || i.name}</div><div class="small text-info text-uppercase">${i.media_type}</div></div>
+                <div class="flex-grow-1"><div class="fw-bold text-white small">${i.title || i.name}</div></div>
             </div>`).join('');
         box.style.display = 'block';
     }
@@ -171,11 +162,10 @@
         if(db.find(x => x.id === id)) return;
         const r = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${KEY}&append_to_response=watch/providers,recommendations&language=pt-PT`);
         const i = await r.json();
-        
         db.unshift({
             id: i.id, type: type, title: i.title || i.name,
-            img: i.poster_path ? `https://image.tmdb.org/t/p/w500${i.poster_path}` : 'https://via.placeholder.com/500x750',
-            bg: i.backdrop_path ? `https://image.tmdb.org/t/p/original${i.backdrop_path}` : '',
+            img: `https://image.tmdb.org/t/p/w500${i.poster_path}`,
+            bg: `https://image.tmdb.org/t/p/original${i.backdrop_path}`,
             desc: i.overview || "Sem sinopse.",
             score: i.vote_average ? i.vote_average.toFixed(1) : '?',
             genres: i.genres?.map(g => g.name) || [],
@@ -189,53 +179,41 @@
 
     function render() {
         const container = document.getElementById('myList');
-        if(isGridView) container.classList.add('grid-view'); else container.classList.remove('grid-view');
         let list = db;
         if(currentFilter !== 'all') list = list.filter(i => i.type === currentFilter);
         if(currentFolderFilter !== 'all') list = list.filter(i => i.folder === currentFolderFilter);
         if(currentGenreFilter !== 'all') list = list.filter(i => i.genres.includes(currentGenreFilter));
         
-        container.innerHTML = list.map(i => {
-            const prog = i.ep_total > 0 ? (i.ep_atual / i.ep_total) * 100 : 0;
-            return `
-            <div class="${isGridView ? '' : 'col-12 col-md-10 mb-2'}">
-                <div class="m-card" onclick="openModal(${i.id})">
-                    <img src="${i.img}" style="width:60px; height:85px; object-fit:cover; border-radius:10px; margin-right:20px">
-                    <div class="flex-grow-1 overflow-hidden">
-                        <div class="card-title">${i.title}</div>
-                        <div class="d-flex align-items-center gap-2 mt-1">
-                            <span class="badge bg-primary bg-opacity-25 text-info" style="font-size:0.55rem">${i.type.toUpperCase()}</span>
-                            <span style="color:var(--tmdb-green); font-weight:bold; font-size:0.8rem">⭐ ${i.score}</span>
-                            ${i.folder !== 'Nenhuma' ? `<span class="badge bg-secondary" style="font-size:0.55rem">${i.folder}</span>` : ''}
-                        </div>
+        container.innerHTML = list.map(i => `
+            <div class="m-card shadow" onclick="openModal(${i.id})">
+                <img src="${i.img}">
+                <button class="btn-del-mini" onclick="event.stopPropagation(); remove(${i.id})">✕</button>
+                <div class="m-card-body">
+                    <div class="card-title">${i.title}</div>
+                    <div class="d-flex justify-content-between align-items-center mt-1">
+                        <span style="color:var(--tmdb-green); font-size:0.75rem; font-weight:800">⭐ ${i.score}</span>
+                        ${i.type === 'tv' ? `<span class="small text-dim" style="font-size:0.6rem">${i.ep_atual}/${i.ep_total}</span>` : ''}
                     </div>
-                    ${i.type === 'tv' && i.ep_total > 0 ? `<div class="card-progress-container"><div class="card-progress-fill" style="width: ${prog}%"></div></div>` : ''}
-                    <button class="btn text-danger opacity-50" onclick="event.stopPropagation(); remove(${i.id})">✕</button>
                 </div>
-            </div>`;
-        }).join('');
+                ${i.type === 'tv' ? `<div class="card-progress-container"><div class="card-progress-fill" style="width: ${(i.ep_atual/i.ep_total)*100}%"></div></div>` : ''}
+            </div>`).join('');
     }
 
     function openModal(id) {
         const i = db.find(x => x.id === id);
         const win = document.getElementById('winContent');
         win.innerHTML = `
-            <div class="position-relative"><img src="${i.bg}" class="backdrop-img"><button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4" data-bs-dismiss="modal"></button></div>
+            <div class="position-relative">
+                <img src="${i.bg}" class="backdrop-img">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"></button>
+            </div>
             <div class="modal-body">
-                <div class="d-flex gap-4 align-items-end mb-4">
-                    <img src="${i.img}" class="poster-main">
-                    <div class="flex-grow-1">
-                        <h2 class="fw-bold text-white mb-1">${i.title}</h2>
-                        <div style="font-size:0.8rem; color:var(--accent); margin-bottom:10px">${i.genres.join(' • ')}</div>
-                        
-                        <div class="mb-3">
-                            <span class="small text-muted d-block mb-1 text-uppercase fw-bold" style="font-size:0.6rem">Onde Ver (PT):</span>
-                            ${i.streaming.length ? i.streaming.map(s => `<img src="https://image.tmdb.org/t/p/w92${s.logo_path}" class="streaming-icon" title="${s.provider_name}">`).join('') : '<span class="text-dim small">Indisponível em Streaming</span>'}
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-sm btn-danger fw-bold" onclick="loadTrailer(${i.id}, '${i.type}')">▶ Trailer</button>
-                            <a id="ytLink" href="#" target="_blank" class="btn btn-sm btn-outline-light" style="display:none">Ver no YT</a>
+                <div class="d-flex gap-3 align-items-start mb-3">
+                    <img src="${i.img}" class="poster-main shadow">
+                    <div class="flex-grow-1 pt-4">
+                        <h5 class="fw-bold mb-1">${i.title}</h5>
+                        <div class="d-flex flex-wrap gap-1 mb-2">
+                            ${i.streaming.map(s => `<img src="https://image.tmdb.org/t/p/w92${s.logo_path}" class="streaming-icon">`).join('')}
                         </div>
                     </div>
                 </div>
@@ -243,29 +221,27 @@
                 ${i.type === 'tv' ? `
                 <div class="bg-dark p-3 rounded-4 mb-3 border border-secondary">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="small fw-bold">PROGRESSO: ${i.ep_atual} / ${i.ep_total}</span>
-                        <button class="btn btn-sm btn-info fw-bold" onclick="updateEp(${i.id}, 1)">+1 Ep</button>
+                        <span class="small fw-bold">Episódios: ${i.ep_atual}/${i.ep_total}</span>
+                        <button class="btn-plus-ep" onclick="updateEp(${i.id}, 1)">+1 Ep</button>
                     </div>
                     <input type="range" class="form-range" min="0" max="${i.ep_total}" value="${i.ep_atual}" onchange="updateEp(${i.id}, this.value, true)">
                 </div>` : ''}
 
+                <div class="d-flex gap-2 mb-3">
+                    <button class="btn btn-sm btn-danger w-100 fw-bold" onclick="loadTrailer(${i.id}, '${i.type}')">Assistir Trailer</button>
+                </div>
                 <div id="trailerContainer" class="video-container mb-3"></div>
-                <p class="small text-dim">${i.desc}</p>
+                <p class="small text-dim" style="line-height:1.4">${i.desc}</p>
                 
-                <div class="row g-2 mt-3 bg-dark p-3 rounded-4">
-                    <div class="col-4"><label class="small text-muted d-block mb-1 text-uppercase" style="font-size:0.6rem">Estado</label>
-                        <select class="form-select bg-dark text-white border-0 fw-bold p-0" onchange="update(${i.id}, 'status', this.value)">
+                <div class="row g-2 mt-2">
+                    <div class="col-6">
+                        <select class="form-select form-select-sm bg-dark text-white border-secondary" onchange="update(${i.id}, 'status', this.value)">
                             <option ${i.status === 'Para Ver' ? 'selected' : ''}>Para Ver</option><option ${i.status === 'Visto' ? 'selected' : ''}>Visto</option>
                         </select>
                     </div>
-                    <div class="col-4 border-start border-secondary"><label class="small text-muted d-block mb-1 text-uppercase" style="font-size:0.6rem">Nota</label>
-                        <select class="form-select bg-dark text-warning border-0 fw-bold p-0" onchange="update(${i.id}, 'nota', this.value)">
-                            ${[0,1,2,3,4,5].map(n => `<option value="${n}" ${i.nota == n ? 'selected' : ''}>${n} Estrelas</option>`).join('')}
-                        </select>
-                    </div>
-                    <div class="col-4 border-start border-secondary"><label class="small text-muted d-block mb-1 text-uppercase" style="font-size:0.6rem">Pasta</label>
-                        <select class="form-select bg-dark text-info border-0 fw-bold p-0" onchange="update(${i.id}, 'folder', this.value)">
-                            <option value="Nenhuma">Nenhuma</option>
+                    <div class="col-6">
+                        <select class="form-select form-select-sm bg-dark text-white border-secondary" onchange="update(${i.id}, 'folder', this.value)">
+                            <option value="Nenhuma">Pasta: Nenhuma</option>
                             ${folders.map(f => `<option value="${f}" ${i.folder === f ? 'selected' : ''}>${f}</option>`).join('')}
                         </select>
                     </div>
@@ -279,25 +255,9 @@
         let d = await r.json();
         const t = d.results.find(v => v.site === 'YouTube');
         if(t) {
-            document.getElementById('trailerContainer').innerHTML = `<iframe src="https://www.youtube.com/embed/${t.key}" frameborder="0" allowfullscreen style="width:100%; height:250px; border-radius:15px"></iframe>`;
+            document.getElementById('trailerContainer').innerHTML = `<iframe src="https://www.youtube.com/embed/${t.key}" frameborder="0" allowfullscreen style="width:100%; height:200px; border-radius:12px"></iframe>`;
             document.getElementById('trailerContainer').style.display = 'block';
-            document.getElementById('ytLink').href = `https://www.youtube.com/watch?v=${t.key}`;
-            document.getElementById('ytLink').style.display = 'inline-block';
         }
-    }
-
-    function updateCalendar() {
-        const content = document.getElementById('calContent');
-        const today = new Date().toISOString().split('T')[0];
-        const future = db.filter(i => i.next_date && i.next_date >= today).sort((a,b) => a.next_date.localeCompare(b.next_date));
-        
-        content.innerHTML = future.length ? future.map(i => `
-            <div class="calendar-item">
-                <div class="fw-bold text-white">${i.title}</div>
-                <div class="small text-accent fw-bold mt-1">📅 ${i.next_date.split('-').reverse().join('/')}</div>
-                <div class="small text-muted">${i.type === 'tv' ? 'Próximo Episódio' : 'Lançamento Filme'}</div>
-            </div>`).join('') : '<div class="text-center text-muted mt-5">Sem estreias próximas na tua lista.</div>';
-        togglePane('calPane');
     }
 
     function updateEp(id, val, isDirect = false) {
@@ -311,13 +271,13 @@
         const bar = document.getElementById('folderBar');
         bar.innerHTML = `<div class="folder-group ${currentFolderFilter === 'all' ? 'active' : ''}"><button class="btn-folder-name" onclick="setFolderFilter('all')">Tudo</button></div>` + 
             folders.map(f => `<div class="folder-group ${currentFolderFilter === f ? 'active' : ''}"><button class="btn-folder-name" onclick="setFolderFilter('${f}')">${f}</button><button class="btn-folder-del" onclick="deleteFolder('${f}')">✕</button></div>`).join('') +
-            `<button class="btn btn-sm btn-outline-secondary ms-2" onclick="newFolder()">+ Pasta</button>`;
+            `<button class="btn btn-sm btn-outline-secondary" onclick="newFolder()">+ Pasta</button>`;
     }
 
     function renderGenreBar() {
         const bar = document.getElementById('genreBar');
         const all = [...new Set(db.flatMap(i => i.genres))].sort();
-        bar.innerHTML = `<button class="btn-genre ${currentGenreFilter === 'all' ? 'active' : ''}" onclick="setGenreFilter('all')">Todos Géneros</button>` + 
+        bar.innerHTML = `<button class="btn-genre ${currentGenreFilter === 'all' ? 'active' : ''}" onclick="setGenreFilter('all')">Todos</button>` + 
             all.map(g => `<button class="btn-genre ${currentGenreFilter === g ? 'active' : ''}" onclick="setGenreFilter('${g}')">${g}</button>`).join('');
     }
 
@@ -327,22 +287,22 @@
     function setFolderFilter(f) { currentFolderFilter = f; render(); renderFolderBar(); }
     function setGenreFilter(g) { currentGenreFilter = g; render(); renderGenreBar(); }
     function setFilter(f) { currentFilter = f; document.querySelectorAll('.btn-tool').forEach(b => b.classList.remove('active')); document.getElementById('btn-'+f).classList.add('active'); render(); }
-    function setSort(s) { currentSort = s; render(); }
-    function toggleView() { isGridView = !isGridView; render(); }
-    function update(id, k, v) { db.find(x => x.id === id)[k] = k === 'nota' ? parseInt(v) : v; save(); }
+    function update(id, k, v) { db.find(x => x.id === id)[k] = v; save(); }
     function remove(id) { const idx = db.findIndex(x => x.id === id); historyStack.push(db[idx]); db.splice(idx, 1); save(); document.getElementById('undoBanner').style.display = 'block'; setTimeout(() => document.getElementById('undoBanner').style.display = 'none', 5000); }
     function undo() { if(historyStack.length) { db.unshift(historyStack.pop()); save(); } document.getElementById('undoBanner').style.display = 'none'; }
-    function pickRandom() {
-        let list = db;
-        if(currentGenreFilter !== 'all') list = list.filter(i => i.genres.includes(currentGenreFilter));
-        if(!list.length) return alert("Lista vazia!");
-        openModal(list[Math.floor(Math.random() * list.length)].id);
-    }
     function renderStats() {
         const vistos = db.filter(i => i.status === 'Visto').length;
-        document.getElementById('statsArea').innerHTML = `<div><span class="stat-val">${db.length}</span><span class="stat-label">Total</span></div><div><span class="stat-val">${vistos}</span><span class="stat-label">Vistos</span></div>`;
+        document.getElementById('statsArea').innerHTML = `<div><span class="stat-val">${db.length}</span><span class="stat-label">Lista</span></div><div><span class="stat-val">${vistos}</span><span class="stat-label">Vistos</span></div>`;
     }
-    function exportJSON() { const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const a = document.createElement('a'); a.href = data; a.download = "cine_ultimate.json"; a.click(); }
+    function updateCalendar() {
+        const content = document.getElementById('calContent');
+        const today = new Date().toISOString().split('T')[0];
+        const future = db.filter(i => i.next_date && i.next_date >= today).sort((a,b) => a.next_date.localeCompare(b.next_date));
+        content.innerHTML = future.map(i => `<div class="p-3 bg-dark rounded-3 mb-2 border-start border-info border-4"><div class="fw-bold">${i.title}</div><div class="small text-accent">${i.next_date}</div></div>`).join('');
+        togglePane('calPane');
+    }
+    function pickRandom() { if(db.length) openModal(db[Math.floor(Math.random()*db.length)].id); }
+    function exportJSON() { const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const a = document.createElement('a'); a.href = data; a.download = "cinetrack.json"; a.click(); }
     function importJSON(input) { const reader = new FileReader(); reader.onload = (e) => { db = JSON.parse(e.target.result); save(); }; reader.readAsText(input.files[0]); }
 
     window.onload = () => { render(); renderStats(); renderFolderBar(); renderGenreBar(); };
