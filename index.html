@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineTrack PRO - Ultimate Fix</title>
+    <title>CineTrack PRO - Final Edition</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root { 
@@ -22,7 +22,8 @@
         .form-control-lg { background: #0f172a !important; border: 2px solid #334155 !important; color: white !important; border-radius: 15px; }
         
         #suggestions { position: absolute; width: 100%; background: #1e293b; border: 1px solid var(--accent); border-radius: 10px; display: none; z-index: 2000; margin-top: 5px; max-height: 300px; overflow-y: auto; }
-        .btn-random { background: var(--star); color: #020617; border: none; border-radius: 15px; padding: 0 20px; font-weight: 800; font-size: 1.2rem; }
+        .btn-random { background: var(--star); color: #020617; border: none; border-radius: 15px; padding: 0 20px; font-weight: 800; font-size: 1.2rem; transition: 0.2s; }
+        .btn-random:active { transform: scale(0.9); }
 
         .scroll-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; margin-bottom: 10px; scrollbar-width: none; align-items: center; }
         .scroll-row::-webkit-scrollbar { display: none; }
@@ -50,21 +51,19 @@
 </head>
 <body>
 
-<div id="undoBanner">Ação removida <button class="btn btn-sm btn-dark ms-2 rounded-pill" onclick="undo()">DESFAZER</button></div>
+<div id="undoBanner">Item removido <button class="btn btn-sm btn-dark ms-2 rounded-pill fw-bold" onclick="undo()">DESFAZER</button></div>
 
 <div class="container py-4">
     <header class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold m-0"><span style="color:var(--accent)">Cine</span>Track</h2>
-        <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="exportJSON()">Backup</button>
-        </div>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="exportJSON()">Exportar Backup</button>
     </header>
 
     <div class="stats-bar" id="statsArea"></div>
 
     <div class="search-container">
-        <input type="text" id="term" class="form-control form-control-lg" placeholder="Pesquisar..." onkeyup="search()">
-        <button class="btn-random" onclick="pickRandom()">🎲</button>
+        <input type="text" id="term" class="form-control form-control-lg" placeholder="Pesquisar filme ou série..." onkeyup="search()">
+        <button class="btn-random" onclick="pickRandom()" title="Escolha Aleatória">🎲</button>
         <div id="suggestions"></div>
     </div>
 
@@ -149,9 +148,9 @@
             <div class="m-card" onclick="openModal(${i.id})">
                 <img src="${i.img}">
                 <div class="fw-bold small text-truncate text-white">${i.title}</div>
-                <div class="d-flex justify-content-between mt-1">
+                <div class="d-flex justify-content-between mt-1 align-items-center">
                     <span style="color:var(--tmdb-green); font-size:0.75rem">⭐ ${i.score}</span>
-                    <button class="btn btn-sm p-0 text-danger" onclick="event.stopPropagation(); remove(${i.id})">Apagar</button>
+                    <button class="btn btn-sm p-0 text-danger opacity-75" style="font-size:0.7rem" onclick="event.stopPropagation(); remove(${i.id})">APAGAR</button>
                 </div>
             </div>`).join('');
     }
@@ -162,7 +161,7 @@
             folders.map(f => `
                 <div class="btn-tool ${currentFolderFilter === f ? 'active' : ''}">
                     <span onclick="setFolderFilter('${f}')">${f}</span>
-                    <small class="ms-2 text-danger" style="cursor:pointer" onclick="deleteFolder('${f}')">✕</small>
+                    <small class="ms-2 text-danger fw-bold" style="cursor:pointer" onclick="deleteFolder('${f}')">✕</small>
                 </div>`).join('') +
             `<button class="btn btn-sm btn-outline-info ms-2" onclick="newFolder()">+ Pasta</button>`;
     }
@@ -176,24 +175,28 @@
 
     function openModal(id) {
         const i = db.find(x => x.id === id);
+        if(!i) return;
         const win = document.getElementById('winContent');
         win.innerHTML = `
             <div class="position-relative"><img src="${i.bg}" class="backdrop-img"></div>
             <div class="modal-body">
                 <div class="d-flex gap-3 align-items-end mb-4">
-                    <img src="${i.img}" class="poster-main">
+                    <img src="${i.img}" class="poster-main shadow">
                     <div>
                         <h4 class="fw-bold text-white mb-2">${i.title}</h4>
-                        <a href="https://www.youtube.com/results?search_query=${i.title} trailer" target="_blank" class="btn btn-sm btn-danger">YouTube</a>
+                        <a href="https://www.youtube.com/results?search_query=${i.title} trailer" target="_blank" class="btn btn-sm btn-danger fw-bold">YouTube</a>
                     </div>
                 </div>
-                ${i.type === 'tv' ? `<div class="bg-dark p-2 rounded-3 mb-3 d-flex justify-content-between">
-                    <span>S: ${i.temporada} E: ${i.episodio}</span>
-                    <button class="btn btn-sm btn-info" onclick="nextEp(${i.id})">+1 Ep</button>
+                ${i.type === 'tv' ? `<div class="bg-dark p-3 rounded-3 mb-3 d-flex justify-content-between align-items-center border border-secondary">
+                    <div class="d-flex gap-2">
+                         <span>T: <input type="number" class="bg-transparent text-white border-0 w-25" value="${i.temporada}" onchange="update(${i.id}, 'temporada', this.value)"></span>
+                         <span>E: <input type="number" class="bg-transparent text-white border-0 w-25" value="${i.episodio}" onchange="update(${i.id}, 'episodio', this.value)"></span>
+                    </div>
+                    <button class="btn btn-sm btn-info fw-bold" onclick="nextEp(${i.id})">+1 Ep</button>
                 </div>` : ''}
                 <p class="small text-dim">${i.desc}</p>
                 
-                <h6 class="mt-4 text-accent">Sugestões / Saga:</h6>
+                <h6 class="mt-4 text-accent fw-bold">Sugestões / Saga:</h6>
                 <div class="d-flex gap-2 overflow-x-auto pb-2">
                     ${i.recs.map(r => `<div class="recommend-card" onclick="add(${r.id}, '${i.type}')"><img src="https://image.tmdb.org/t/p/w200${r.poster_path}"><div class="small text-truncate mt-1">${r.title || r.name}</div></div>`).join('')}
                 </div>
@@ -210,14 +213,16 @@
     function remove(id) { const idx = db.findIndex(x => x.id === id); historyStack.push({...db[idx]}); db.splice(idx, 1); save(); showUndo(); }
     function showUndo() { const b = document.getElementById('undoBanner'); b.style.display = 'block'; setTimeout(() => b.style.display = 'none', 5000); }
     function undo() { if(historyStack.length) { db.unshift(historyStack.pop()); save(); } document.getElementById('undoBanner').style.display = 'none'; }
-    function setFilter(f) { currentFilter = f; render(); }
+    function setFilter(f) { currentFilter = f; document.querySelectorAll('.btn-tool').forEach(b => b.classList.remove('active')); if(document.getElementById('btn-'+f)) document.getElementById('btn-'+f).classList.add('active'); render(); }
     function setFolderFilter(f) { currentFolderFilter = f; render(); renderFolderBar(); }
     function setGenreFilter(g) { currentGenreFilter = g; render(); renderGenreBar(); }
     function newFolder() { const n = prompt("Nome da pasta:"); if(n) { folders.push(n); save(); } }
-    function update(id, k, v) { db.find(x => x.id === id)[k] = v; save(); }
+    function update(id, k, v) { const i = db.find(x => x.id === id); if(i) { i[k] = v; save(); } }
     function nextEp(id) { const i = db.find(x => x.id === id); i.episodio++; save(); openModal(id); }
     function renderStats() { document.getElementById('statsArea').innerHTML = `<div><span class="stat-val">${db.length}</span><span class="stat-label">Total</span></div><div><span class="stat-val">${db.filter(x=>x.status==='Visto').length}</span><span class="stat-label">Vistos</span></div>`; }
-    function exportJSON() { const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const a = document.createElement('a'); a.href = data; a.download = "cine_backup.json"; a.click(); }
+    function pickRandom() { if(db.length > 0) { const r = db[Math.floor(Math.random()*db.length)]; openModal(r.id); } }
+    function exportJSON() { const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const a = document.createElement('a'); a.href = data; a.download = "cinetrack_backup.json"; a.click(); }
+    
     window.onload = () => { render(); renderStats(); renderFolderBar(); renderGenreBar(); };
 </script>
 </body>
