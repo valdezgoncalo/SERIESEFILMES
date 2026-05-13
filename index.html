@@ -101,7 +101,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .progress-bar-fill{height:100%;background:var(--gold);border-radius:1px;transition:width .4s;}
 
 /* ── LIST VIEW ── */
-#myList.list-view{display:flex;flex-direction:column;gap:0;}
+#myList.list-view{display:flex!important;flex-direction:column;gap:0;}
 #myList.list-view .m-card{border-radius:0;border-left:none;border-right:none;border-top:none;display:flex;flex-direction:row;}
 #myList.list-view .m-card:first-child{border-top:1px solid var(--border);}
 #myList.list-view .m-card-poster{width:50px;height:75px;aspect-ratio:unset;flex-shrink:0;}
@@ -121,7 +121,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 /* ── MODAL ── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;padding:16px;}
 .modal-overlay.open{display:flex;}
-.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;position:relative;}
+.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;position:relative;} 
 .modal-bg{width:100%;height:210px;object-fit:cover;display:block;border-radius:18px 18px 0 0;}
 .modal-bg-wrap{position:relative;}
 .modal-bg-wrap::after{content:'';position:absolute;bottom:0;left:0;right:0;height:100px;background:linear-gradient(to top,var(--bg2),transparent);}
@@ -317,14 +317,14 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="stats-strip" id="statsArea"></div>
     <div class="filter-bar">
       <div class="filter-row">
-        <button class="fp active" onclick="setFilter('type','all',this,'type')">Tudo</button>
-        <button class="fp" onclick="setFilter('type','movie',this,'type')">🎬 Filmes</button>
-        <button class="fp" onclick="setFilter('type','tv',this,'type')">📺 Séries</button>
+        <button class="fp active" data-group="type" onclick="setFilter('type','all',this,'type')">Tudo</button>
+        <button class="fp" data-group="type" onclick="setFilter('type','movie',this,'type')">🎬 Filmes</button>
+        <button class="fp" data-group="type" onclick="setFilter('type','tv',this,'type')">📺 Séries</button>
         <div class="fp-sep"></div>
-        <button class="fp active" onclick="setFilter('status','all',this,'status')">Todos</button>
-        <button class="fp" onclick="setFilter('status','Para Ver',this,'status')">Para Ver</button>
-        <button class="fp" onclick="setFilter('status','A Ver',this,'status')">A Ver</button>
-        <button class="fp" onclick="setFilter('status','Visto',this,'status')">Vistos</button>
+        <button class="fp active" data-group="status" onclick="setFilter('status','all',this,'status')">Todos</button>
+        <button class="fp" data-group="status" onclick="setFilter('status','Para Ver',this,'status')">Para Ver</button>
+        <button class="fp" data-group="status" onclick="setFilter('status','A Ver',this,'status')">A Ver</button>
+        <button class="fp" data-group="status" onclick="setFilter('status','Visto',this,'status')">Vistos</button>
         <div class="fp-sep"></div>
         <select class="sort-sel" onchange="currentSort=this.value;render()">
           <option value="added">Recentes</option>
@@ -413,7 +413,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   <div class="qr-box" onclick="event.stopPropagation()">
     <div class="section-title" style="margin-bottom:6px;">📲 Partilhar Lista</div>
     <p style="font-size:12px;color:var(--text2);margin-bottom:0;">Digitaliza o QR para importar a lista noutro dispositivo.</p>
-    <canvas id="qrCanvas" width="200" height="200"></canvas>
+    <canvas id="qrCanvas" width="200" height="200" style="display:none;"></canvas>
+    <div id="qrDiv" style="margin:16px auto;width:200px;height:200px;display:flex;align-items:center;justify-content:center;background:var(--bg3);border-radius:8px;"></div>
     <p style="font-size:11px;color:var(--text3);">Ou copia o link abaixo:</p>
     <input type="text" id="shareUrl" class="inp" style="font-size:11px;" readonly onclick="this.select()">
     <button class="btn-g" style="width:100%;margin-top:10px;" onclick="copyShareUrl()">Copiar Link</button>
@@ -435,12 +436,15 @@ let currentSort='added';
 let viewMode='grid'; // grid | list
 let currentPage='library';
 
+let modalOpenId = null;
+
 // ─── SAVE ─────────────────────────────────────────────────────────
 function save(){
   localStorage.setItem(DB_KEY,JSON.stringify(db));
   localStorage.setItem(FL_KEY,JSON.stringify(folders));
   renderStats(); renderFolderBar(); renderGenreBar(); renderFolderNav(); updateCounts();
-  if(currentPage==='library') render();
+  // Only re-render grid if modal is not open (avoid destroying focused inputs)
+  if(currentPage==='library' && !modalOpenId) render();
   if(currentPage==='stats') renderStatsPage();
   if(currentPage==='history') renderHistory();
   populateCompareSelects();
@@ -612,7 +616,10 @@ function render(){
 }
 
 function epPct(i){
-  const watched=((i.temporada-1)*Math.ceil((i.totalEps/Math.max(i.totalSeasons,1))))+i.episodio;
+  if(!i.totalEps||i.totalEps===0) return 0;
+  // Use episodio as a running total across all seasons if totalSeasons known
+  const epPerSeason=Math.ceil(i.totalEps/Math.max(i.totalSeasons||1,1));
+  const watched=((i.temporada-1)*epPerSeason)+i.episodio;
   return Math.min(Math.round((watched/i.totalEps)*100),100);
 }
 
@@ -648,6 +655,7 @@ function renderFolderNav(){
 
 // ─── MODAL ────────────────────────────────────────────────────────
 function openModal(id){
+  modalOpenId = id;
   const i=db.find(x=>x.id===id);
   if(!i) return;
   const poster=i.img||`https://via.placeholder.com/300x450/1a1c22/555?text=?`;
@@ -736,9 +744,11 @@ function openModal(id){
 }
 
 function closeModal(e){
-  if(e&&e.target!==document.getElementById('mainModal')) return;
+  if(e && e.target !== document.getElementById('mainModal')) return;
   document.getElementById('mainModal').classList.remove('open');
   document.body.style.overflow='';
+  modalOpenId = null;
+  render(); // refresh grid now that modal is closed
 }
 
 function refreshModalBadge(id){ /* visual update handled by save() -> render() */ }
@@ -914,7 +924,7 @@ function openTonight(){
   ov.classList.add('open');
 }
 function closeTonightOverlay(e){
-  if(e&&e.target!==document.getElementById('tonightOverlay')) return;
+  if(e && e.target !== document.getElementById('tonightOverlay')) return;
   document.getElementById('tonightOverlay').classList.remove('open');
 }
 function selectMood(idx){
@@ -957,7 +967,7 @@ async function searchActor(){
     const d=await r.json();
     const people=(d.results||[]).slice(0,5);
     pList.innerHTML=people.map(p=>`
-      <div class="actor-person" onclick="loadPersonMovies(${p.id},'${(p.name||'').replace(/'/g,'\\'')}')">
+      <div class="actor-person" data-pid="${p.id}" data-pname="${(p.name||'').replace(/"/g,'&quot;')}" onclick="loadPersonMovies(parseInt(this.dataset.pid), this.dataset.pname)">
         <img src="${p.profile_path?'https://image.tmdb.org/t/p/w92'+p.profile_path:'https://via.placeholder.com/92x92/1a1c22/555'}" onerror="this.src='https://via.placeholder.com/40x40/1a1c22/555'">
         <div><div class="actor-person-name">${p.name}</div><div class="actor-person-meta">${p.known_for_department||''}</div></div>
       </div>`).join('');
@@ -1027,19 +1037,17 @@ function openQR(){
   const encoded=btoa(encodeURIComponent(data));
   const url=`${location.origin}${location.pathname}?import=${encoded}`;
   document.getElementById('shareUrl').value=url;
-  const canvas=document.getElementById('qrCanvas');
-  const ctx=canvas.getContext('2d');
-  ctx.fillStyle='#1a1c22';ctx.fillRect(0,0,200,200);
-  ctx.fillStyle='#e8a020';ctx.font='12px DM Sans';ctx.textAlign='center';
-  ctx.fillText('QR disponível após',100,90);
-  ctx.fillText('instalar como PWA',100,110);
+  const qrDiv=document.getElementById('qrDiv');
+  qrDiv.innerHTML=''; // clear previous QR
   try{
-    new QRCode(canvas,{text:url,width:200,height:200,colorDark:'#e8a020',colorLight:'#1a1c22'});
-  }catch(e){}
+    new QRCode(qrDiv,{text:url,width:200,height:200,colorDark:'#e8a020',colorLight:'#1a1c22'});
+  }catch(e){
+    qrDiv.innerHTML='<span style="font-size:12px;color:var(--text3);padding:16px;text-align:center;display:block;">QR indisponível.<br>Usa o link abaixo.</span>';
+  }
   document.getElementById('qrOverlay').classList.add('open');
 }
 function closeQR(e){
-  if(e&&e.target!==document.getElementById('qrOverlay')) return;
+  if(e && e.target !== document.getElementById('qrOverlay')) return;
   document.getElementById('qrOverlay').classList.remove('open');
 }
 function copyShareUrl(){
