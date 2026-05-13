@@ -245,7 +245,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .history-date{font-size:11px;color:var(--text3);}
 
 /* ── MOBILE ── */
-.sidebar-toggle{display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;}
+.sidebar-toggle{display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;flex-shrink:0;}
 .overlay-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199;}
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%);}
@@ -253,10 +253,35 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
   .main{margin-left:0;}
   .sidebar-toggle{display:flex;}
   .overlay-bg.show{display:block;}
-  #myList{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));padding:14px 16px;gap:12px;}
-  .stats-strip .stat-cell{padding:12px 16px;}
-  .filter-bar{padding:12px 16px;}
-  .topbar{padding:11px 16px;}
+
+  /* Topbar: 2 rows on mobile */
+  .topbar{flex-wrap:wrap;padding:10px 14px;gap:8px;}
+  .topbar-search{flex:1;max-width:100%;}
+  /* 16px prevents iOS auto-zoom on input focus */
+  .search-inp{font-size:16px!important;padding:12px 14px 12px 38px!important;}
+  #localSearch{font-size:16px!important;padding:12px 14px!important;flex:1;}
+  .topbar-extras{width:100%;display:flex;gap:8px;}
+
+  /* Grid */
+  #myList{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));padding:12px 14px;gap:10px;}
+
+  /* Stats */
+  .stats-strip .stat-cell{padding:10px 14px;}
+  .stat-num{font-size:1.2rem;}
+
+  /* Filters */
+  .filter-bar{padding:10px 14px;}
+
+  /* Modal slides up from bottom */
+  .modal-overlay{padding:0;align-items:flex-end;}
+  .modal-box{border-radius:18px 18px 0 0;max-height:92vh;width:100%;max-width:100%;}
+
+  /* Compare stacks vertically */
+  #compareResult > div{grid-template-columns:1fr!important;}
+
+  /* Suggestions */
+  .sugg-item{padding:12px 14px;}
+  .sugg-title{font-size:14px;}
 }
 </style>
 </head>
@@ -307,9 +332,11 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <input type="text" id="term" class="search-inp" placeholder="Adicionar filme ou série..." onkeyup="searchGlobal()" autocomplete="off">
       <div id="suggestions"></div>
     </div>
-    <input type="text" id="localSearch" class="search-inp" style="max-width:200px;" placeholder="Filtrar lista..." onkeyup="render()">
-    <div class="btn-icon" onclick="toggleView()" title="Alternar vista" id="viewToggle">⊞</div>
-    <button class="btn-g btn-sm" onclick="openCompare()">⚖️ Comparar</button>
+    <div class="topbar-extras">
+      <input type="text" id="localSearch" class="search-inp" style="max-width:200px;" placeholder="Filtrar lista..." onkeyup="render()">
+      <div class="btn-icon" onclick="toggleView()" title="Alternar vista" id="viewToggle">⊞</div>
+      <button class="btn-g btn-sm" onclick="openCompare()">⚖️</button>
+    </div>
   </div>
 
   <!-- ── LIBRARY PAGE ── -->
