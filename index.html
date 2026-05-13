@@ -3,406 +3,507 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineTrack PRO - Gold Edition Enhanced</title>
+    <title>CineTrack PRO</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --bg-body: #f1f5f9; 
-            --bg-card: #ffffff; 
-            --accent-gold: #f59e0b; 
-            --accent-gold-dark: #d97706;
-            --text-dark: #0f172a; 
-            --text-muted: #64748b; 
-            --btn-dark: #1e293b;
-            --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.1);
-            --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.1);
-            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1);
+        :root {
+            --gold: #e8a020;
+            --gold-light: #f5be5a;
+            --gold-dim: rgba(232,160,32,0.12);
+            --bg: #0c0d0f;
+            --bg2: #131418;
+            --bg3: #1a1c22;
+            --bg4: #22252e;
+            --border: rgba(255,255,255,0.07);
+            --border-gold: rgba(232,160,32,0.3);
+            --text: #f0f0f0;
+            --text2: #9098a8;
+            --text3: #5a6072;
+            --success: #2ecc87;
+            --info: #4da6f5;
+            --danger: #f55a5a;
+            --radius: 14px;
+            --radius-sm: 8px;
         }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        * { box-sizing: border-box; }
-
-        body { 
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-            color: var(--text-dark); 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-            padding-bottom: 60px;
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
             min-height: 100vh;
+            padding-bottom: 80px;
         }
 
-        header { 
-            background: white; 
-            padding: 20px; 
-            border-radius: 20px; 
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 30px;
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+        /* HEADER */
+        .app-header {
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            padding: 18px 28px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
         }
-        
-        header h2 { 
-            color: var(--text-dark); 
-            font-weight: 800; 
-            font-size: 2rem;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .text-gold { 
-            color: var(--accent-gold) !important; 
-            text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
-        }
-        
-        .header-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .app-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
             font-size: 1.5rem;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            color: var(--text);
+            letter-spacing: -0.5px;
         }
+        .app-title span { color: var(--gold); }
 
-        .stats-bar {
-            background: white;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 30px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
+        /* STATS */
+        .stats-strip {
+            display: flex;
+            gap: 2px;
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
         }
-        
-        .stat-item {
-            text-align: center;
-            padding: 15px;
-            border-radius: 15px;
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            transition: all 0.3s ease;
+        .stat-pill {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 14px 24px;
+            min-width: 90px;
+            border-right: 1px solid var(--border);
+            transition: background 0.2s;
             cursor: default;
         }
-        
-        .stat-item:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-md);
-        }
-        
-        .stat-val {
-            display: block;
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--accent-gold-dark);
-            margin-bottom: 5px;
-        }
-        
-        .stat-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            color: var(--text-muted);
+        .stat-pill:hover { background: var(--bg3); }
+        .stat-num {
+            font-family: 'Syne', sans-serif;
             font-weight: 700;
-            letter-spacing: 0.5px;
+            font-size: 1.4rem;
+            color: var(--gold);
+            line-height: 1;
         }
+        .stat-lbl { font-size: 0.68rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; }
 
-        .search-section { 
-            background: var(--bg-card); 
-            padding: 30px; 
-            border-radius: 20px; 
-            box-shadow: var(--shadow-sm); 
-            margin-bottom: 30px;
-            border: 1px solid #e2e8f0;
+        /* SEARCH SECTION */
+        .search-wrap {
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 28px;
         }
-        
-        .search-label {
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            letter-spacing: 1px;
-            display: block;
+        .inp {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: var(--radius-sm);
+            padding: 10px 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            width: 100%;
+            transition: border-color 0.2s, background 0.2s;
+            outline: none;
         }
-        
-        .form-control-custom { 
-            background: #f8fafc !important; 
-            border: 2px solid #e2e8f0 !important; 
-            color: var(--text-dark) !important; 
-            border-radius: 12px;
-            padding: 12px 20px !important;
-            font-size: 1rem !important;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-        
-        .form-control-custom:focus { 
-            border-color: var(--accent-gold) !important; 
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1) !important;
-            background: white !important;
-        }
+        .inp:focus { border-color: var(--border-gold); background: var(--bg4); }
+        .inp::placeholder { color: var(--text3); }
 
-        #suggestions { 
-            position: absolute; 
-            width: 100%; 
-            background: white; 
-            z-index: 2000; 
-            border-radius: 12px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
-            border: 1px solid #e2e8f0;
-            display: none; 
-            margin-top: 8px;
-            max-height: 400px;
-            overflow-y: auto;
+        /* SUGGESTIONS */
+        #suggestions {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0; right: 0;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            z-index: 2000;
+            display: none;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
-        
-        .suggestion-item {
-            padding: 15px;
-            border-bottom: 1px solid #f1f5f9;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .sugg-item {
             display: flex;
             align-items: center;
-            gap: 15px;
-        }
-        
-        .suggestion-item:hover {
-            background: linear-gradient(90deg, #fef3c7 0%, transparent 100%);
-        }
-
-        .filter-group { 
-            background: #f8fafc; 
-            padding: 12px; 
-            border-radius: 15px; 
-            display: flex; 
-            gap: 8px; 
-            flex-wrap: wrap;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .btn-tool { 
-            background: white; 
-            color: var(--text-muted); 
-            border: 2px solid #e2e8f0; 
-            border-radius: 10px; 
-            padding: 8px 16px; 
-            font-size: 0.85rem; 
-            font-weight: 700;
-            transition: all 0.3s ease;
+            gap: 12px;
+            padding: 12px 16px;
             cursor: pointer;
+            transition: background 0.15s;
+            border-bottom: 1px solid var(--border);
+        }
+        .sugg-item:last-child { border-bottom: none; }
+        .sugg-item:hover { background: var(--bg4); }
+        .sugg-item img { width: 32px; height: 48px; object-fit: cover; border-radius: 4px; flex-shrink: 0; }
+        .sugg-title { font-size: 14px; font-weight: 500; color: var(--text); }
+        .sugg-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+        .sugg-badge { font-size: 10px; background: var(--gold-dim); color: var(--gold); border-radius: 4px; padding: 2px 6px; margin-left: auto; flex-shrink: 0; }
+
+        /* FILTER PILLS */
+        .filter-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+        .fp {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            border-radius: 99px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
             white-space: nowrap;
         }
-        
-        .btn-tool:hover {
-            border-color: var(--accent-gold);
-            color: var(--accent-gold-dark);
-            transform: translateY(-2px);
-        }
-        
-        .btn-tool.active { 
-            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark));
-            color: white; 
-            border-color: var(--accent-gold);
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-        }
+        .fp:hover { border-color: var(--border-gold); color: var(--gold); }
+        .fp.active { background: var(--gold); border-color: var(--gold); color: #0c0d0f; font-weight: 600; }
+        .fp-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
 
-        .btn-gold { 
-            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark));
-            color: white; 
-            font-weight: 700; 
-            border-radius: 12px; 
-            border: none; 
-            padding: 10px 24px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-            font-size: 0.9rem;
-        }
-        
-        .btn-gold:hover { 
-            background: linear-gradient(135deg, var(--accent-gold-dark), #b45309);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
-        }
-
-        .scroll-row { 
-            display: flex; 
-            gap: 10px; 
-            overflow-x: auto; 
-            padding: 12px 0; 
-        }
-        
-        .scroll-row::-webkit-scrollbar {
-            height: 6px;
-        }
-        
-        .scroll-row::-webkit-scrollbar-thumb {
-            background: var(--accent-gold);
-            border-radius: 10px;
-        }
-
-        #myList.grid-view { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); 
-            gap: 25px;
-        }
-        
-        .m-card { 
-            background: var(--bg-card); 
-            border-radius: 18px; 
-            padding: 15px; 
-            box-shadow: var(--shadow-sm);
-            border: 2px solid #f1f5f9;
-            transition: all 0.3s ease;
+        /* SORT */
+        .sort-select {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            border-radius: var(--radius-sm);
+            padding: 6px 12px;
+            font-size: 12px;
+            font-family: 'DM Sans', sans-serif;
             cursor: pointer;
+            outline: none;
+        }
+
+        /* SCROLL BARS */
+        .tag-scroll { display: flex; gap: 6px; overflow-x: auto; padding: 10px 0 4px; }
+
+        /* GRID */
+        #myList {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 18px;
+            padding: 24px 28px;
+        }
+
+        /* CARD */
+        .m-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
             position: relative;
         }
-        
-        .m-card:hover { 
-            transform: translateY(-10px); 
-            box-shadow: var(--shadow-lg);
-            border-color: var(--accent-gold);
+        .m-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--border-gold);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
         }
-        
-        .m-card img {
-            width: 100%; 
-            height: 230px; 
-            object-fit: cover; 
-            border-radius: 12px; 
-            margin-bottom: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        .m-card-poster { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; }
+        .m-card-body { padding: 10px 12px 12px; }
+        .m-card-title { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; min-height: 2.6em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 8px; }
+        .m-card-meta { display: flex; justify-content: space-between; align-items: center; }
+
+        /* STATUS BADGE ON CARD */
+        .status-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            border: 2px solid var(--bg2);
         }
-        
-        .card-title {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: var(--text-dark);
-            margin-bottom: 8px;
-            min-height: 2.6em;
+        .status-dot.visto { background: var(--success); }
+        .status-dot.a-ver { background: var(--gold); }
+        .status-dot.para-ver { background: var(--text3); }
+
+        /* USER RATING STARS on card */
+        .star-mini { font-size: 10px; color: var(--gold); letter-spacing: -1px; }
+        .score-pill { font-size: 11px; font-weight: 600; color: var(--gold); }
+
+        /* Series progress on card */
+        .ep-label { font-size: 10px; color: var(--text3); margin-top: 4px; }
+
+        /* DELETE BTN */
+        .del-btn {
+            position: absolute;
+            top: 8px; left: 8px;
+            background: rgba(0,0,0,0.7);
+            border: none;
+            color: var(--danger);
+            width: 24px; height: 24px;
+            border-radius: 6px;
+            font-size: 12px;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+            cursor: pointer;
+        }
+        .m-card:hover .del-btn { opacity: 1; }
+
+        /* MODAL */
+        .modal-content {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text);
             overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
+        }
+        .modal-backdrop.show { opacity: 0.7; }
+        .modal-header-img { width: 100%; height: 240px; object-fit: cover; display: block; }
+        .modal-header-img-wrap { position: relative; }
+        .modal-header-img-wrap::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 120px;
+            background: linear-gradient(to top, var(--bg2), transparent);
+        }
+        .modal-inner { padding: 0 24px 24px; }
+        .modal-poster { width: 100px; border-radius: 12px; border: 3px solid var(--bg2); margin-top: -50px; position: relative; z-index: 1; flex-shrink: 0; }
+        .modal-title-txt { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.3rem; color: var(--text); }
+
+        /* STAR RATING */
+        .star-rating { display: flex; gap: 4px; }
+        .star-btn { font-size: 20px; cursor: pointer; line-height: 1; transition: transform 0.1s; color: var(--text3); background: none; border: none; padding: 0; }
+        .star-btn:hover, .star-btn.active { color: var(--gold); transform: scale(1.15); }
+
+        /* TEXTAREA */
+        .note-area {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            width: 100%;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 70px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .note-area:focus { border-color: var(--border-gold); }
+
+        /* SELECT */
+        .sel {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: var(--radius-sm);
+            padding: 9px 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            width: 100%;
+            outline: none;
+            cursor: pointer;
+        }
+        .sel:focus { border-color: var(--border-gold); }
+
+        /* LABELS */
+        .field-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); font-weight: 600; margin-bottom: 6px; display: block; }
+
+        /* GOLD BTN */
+        .btn-g {
+            background: var(--gold);
+            color: #0c0d0f;
+            font-weight: 700;
+            font-family: 'DM Sans', sans-serif;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 8px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+        .btn-g:hover { opacity: 0.88; transform: translateY(-1px); }
+
+        /* OUTLINE BTN */
+        .btn-o {
+            background: transparent;
+            color: var(--text2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 16px;
+            font-size: 13px;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .btn-o:hover { border-color: var(--border-gold); color: var(--gold); }
+
+        /* RECS */
+        .rec-item { min-width: 80px; text-align: center; cursor: pointer; }
+        .rec-item img { width: 80px; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); transition: border-color 0.2s; }
+        .rec-item:hover img { border-color: var(--border-gold); }
+        .rec-title { font-size: 10px; color: var(--text2); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .rec-already { position: relative; }
+        .rec-already::after { content: '✓'; position: absolute; top: 4px; right: 4px; background: var(--success); color: #0c0d0f; width: 16px; height: 16px; border-radius: 50%; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
+        /* DATE WATCHED */
+        .date-inp {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: var(--radius-sm);
+            padding: 9px 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            width: 100%;
+            outline: none;
+            color-scheme: dark;
+        }
+        .date-inp:focus { border-color: var(--border-gold); }
+
+        /* UNDO BANNER */
+        #undoBanner {
+            display: none;
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg4);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 14px 24px;
+            border-radius: 99px;
+            z-index: 9999;
+            font-size: 14px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            white-space: nowrap;
         }
 
-        .modal-content { 
-            border-radius: 28px; 
-            border: none; 
-            overflow: hidden; 
-            background: white;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+        /* EMPTY STATE */
+        .empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text3);
         }
-        
-        .modal-header-img { 
-            width: 100%; 
-            height: 280px; 
-            object-fit: cover;
+        .empty-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.4; }
+        .empty-txt { font-family: 'Syne', sans-serif; font-size: 1.1rem; }
+
+        /* GENRE TAG */
+        .gtag {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-size: 11px;
         }
 
-        .btn-youtube { 
-            background: #ff0000; 
-            color: white; 
-            font-weight: 700; 
-            border-radius: 10px; 
-            text-decoration: none; 
-            padding: 8px 16px; 
-            font-size: 0.85rem;
+        /* YOUTUBE BTN */
+        .yt-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
+            gap: 6px;
+            background: rgba(255,0,0,0.15);
+            color: #ff6b6b;
+            border: 1px solid rgba(255,0,0,0.2);
+            border-radius: var(--radius-sm);
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s;
         }
-        
-        .btn-youtube:hover {
-            background: #cc0000;
-            color: white;
+        .yt-btn:hover { background: rgba(255,0,0,0.25); color: #ff6b6b; }
+
+        /* DIVIDER */
+        .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+        /* EPS CONTROLS */
+        .ep-ctrl { display: flex; align-items: center; gap: 8px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; }
+        .ep-num-inp { background: var(--bg4); border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 4px 8px; font-size: 13px; width: 60px; text-align: center; outline: none; }
+
+        /* WATCHED DATE display */
+        .watched-lbl { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 6px; }
+
+        /* BADGE */
+        .badge-status { font-size: 11px; padding: 3px 10px; border-radius: 99px; font-weight: 600; }
+        .badge-visto { background: rgba(46,204,135,0.15); color: var(--success); }
+        .badge-a-ver { background: rgba(232,160,32,0.15); color: var(--gold); }
+        .badge-para-ver { background: rgba(90,96,114,0.2); color: var(--text3); }
+
+        /* CLOSE BUTTON */
+        .close-modal { background: var(--bg4); border: none; color: var(--text2); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
+        .close-modal:hover { color: var(--text); }
+
+        @media (max-width: 600px) {
+            #myList { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); padding: 16px; gap: 12px; }
+            .app-header { padding: 14px 16px; }
+            .search-wrap { padding: 16px; }
         }
 
-        #undoBanner { 
-            display: none; 
-            position: fixed; 
-            bottom: 30px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            background: var(--btn-dark);
-            color: white; 
-            padding: 18px 35px; 
-            border-radius: 50px; 
-            z-index: 9999; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-        }
+        /* LOADING SPINNER */
+        .spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        @media (max-width: 768px) {
-            #myList.grid-view {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            }
-        }
+        .adding-indicator { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(12,13,15,0.7); display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); }
     </style>
 </head>
 <body>
 
+<!-- UNDO BANNER -->
 <div id="undoBanner">
-    🗑️ <strong>Item removido</strong> 
-    <button class="btn btn-sm btn-warning ms-3 fw-bold rounded-pill" onclick="undo()">DESFAZER</button>
+    Item removido &nbsp;&nbsp;
+    <button onclick="undo()" style="background:var(--gold);color:#0c0d0f;border:none;border-radius:99px;padding:4px 14px;font-size:13px;font-weight:700;cursor:pointer;">Desfazer</button>
 </div>
 
-<div class="container py-4">
-    <header>
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <h2>
-                <span class="header-icon">🎬</span>
-                CineTrack <span class="text-gold">PRO</span>
-            </h2>
-            <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-bold" onclick="exportJSON()">💾 Exportar</button>
-                <label class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-bold m-0" for="importFile" style="cursor: pointer;">📂 Importar</label>
-                <input type="file" id="importFile" style="display:none" accept=".json" onchange="importJSON(this)">
-            </div>
+<!-- HEADER -->
+<header class="app-header">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div class="app-title">Cine<span>Track</span> PRO</div>
+        <div style="display:flex;gap:8px;">
+            <button class="btn-o" onclick="exportJSON()" style="font-size:12px;padding:6px 14px;">↓ Exportar</button>
+            <label class="btn-o" for="importFile" style="font-size:12px;padding:6px 14px;cursor:pointer;margin:0;">↑ Importar</label>
+            <input type="file" id="importFile" style="display:none" accept=".json" onchange="importJSON(this)">
         </div>
-    </header>
+    </div>
+</header>
 
-    <div class="stats-bar" id="statsArea"></div>
+<!-- STATS -->
+<div class="stats-strip" id="statsArea"></div>
 
-    <div class="search-section">
-        <div class="row g-3 mb-4">
-            <div class="col-md-7 position-relative">
-                <label class="search-label">🔍 Adicionar Novo Conteúdo</label>
-                <input type="text" id="term" class="form-control form-control-lg form-control-custom" 
-                       placeholder="Pesquisar filmes e séries..." 
-                       onkeyup="searchGlobal()">
-                <div id="suggestions"></div>
-            </div>
-            <div class="col-md-5">
-                <label class="search-label">🔎 Filtrar Na Minha Lista</label>
-                <input type="text" id="localSearch" class="form-control form-control-lg form-control-custom" 
-                       placeholder="Procurar por título..." 
-                       onkeyup="render()">
-            </div>
+<!-- SEARCH + FILTERS -->
+<div class="search-wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div style="position:relative;">
+            <input type="text" id="term" class="inp" placeholder="Adicionar filme ou série..." onkeyup="searchGlobal()" autocomplete="off">
+            <div id="suggestions"></div>
         </div>
-
-        <div class="d-flex flex-wrap gap-3 align-items-center mb-3">
-            <div class="filter-group">
-                <button class="btn-tool active" data-type="all" onclick="setFilter('type', 'all', this)">📁 Tudo</button>
-                <button class="btn-tool" data-type="movie" onclick="setFilter('type', 'movie', this)">🎬 Filmes</button>
-                <button class="btn-tool" data-type="tv" onclick="setFilter('type', 'tv', this)">📺 Séries</button>
-            </div>
-            <div class="filter-group">
-                <button class="btn-tool active" data-status="all" onclick="setFilter('status', 'all', this)">Todos</button>
-                <button class="btn-tool" data-status="Para Ver" onclick="setFilter('status', 'Para Ver', this)">📌 Para Ver</button>
-                <button class="btn-tool" data-status="A Ver" onclick="setFilter('status', 'A Ver', this)">▶️ A Ver</button>
-                <button class="btn-tool" data-status="Visto" onclick="setFilter('status', 'Visto', this)">✅ Vistos</button>
-            </div>
-            <button class="btn btn-gold" onclick="pickRandom()">🎲 Escolha Aleatória</button>
-        </div>
-
-        <div class="scroll-row" id="folderBar"></div>
-        <div class="scroll-row" id="genreBar"></div>
+        <input type="text" id="localSearch" class="inp" placeholder="Filtrar na minha lista..." onkeyup="render()">
     </div>
 
-    <div id="myList" class="grid-view"></div>
+    <div class="filter-row">
+        <!-- type -->
+        <button class="fp active" onclick="setFilter('type','all',this)">Tudo</button>
+        <button class="fp" onclick="setFilter('type','movie',this)">🎬 Filmes</button>
+        <button class="fp" onclick="setFilter('type','tv',this)">📺 Séries</button>
+        <div class="fp-sep"></div>
+        <!-- status -->
+        <button class="fp active" onclick="setFilter('status','all',this)" data-group="status">Todos</button>
+        <button class="fp" onclick="setFilter('status','Para Ver',this)" data-group="status">Para Ver</button>
+        <button class="fp" onclick="setFilter('status','A Ver',this)" data-group="status">A Ver</button>
+        <button class="fp" onclick="setFilter('status','Visto',this)" data-group="status">Vistos</button>
+        <div class="fp-sep"></div>
+        <!-- sort -->
+        <select class="sort-select" onchange="currentSort=this.value; render()">
+            <option value="added">Recentes</option>
+            <option value="title">Título A-Z</option>
+            <option value="score">Nota TMDB</option>
+            <option value="myrating">Minha Nota</option>
+            <option value="watched">Data Vista</option>
+        </select>
+        <button class="btn-g" onclick="pickRandom()" style="margin-left:auto;padding:6px 14px;font-size:12px;">🎲 Aleatório</button>
+    </div>
+
+    <div class="tag-scroll" id="folderBar"></div>
+    <div class="tag-scroll" id="genreBar"></div>
 </div>
 
+<!-- GRID -->
+<div id="myList"></div>
+
+<!-- MODAL -->
 <div class="modal fade" id="win" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content" id="winContent"></div>
@@ -411,212 +512,378 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const KEY = '8661bff51991b4bcd2a9a9e9fa66b639';
-    const DB_NAME = 'cinetrack_production_v2';
-    const FL_NAME = 'cinetrack_folders_v2';
+const KEY = '8661bff51991b4bcd2a9a9e9fa66b639';
+const DB = 'ct_db_v3';
+const FL = 'ct_folders_v3';
 
-    let db = JSON.parse(localStorage.getItem(DB_NAME)) || [];
-    let folders = JSON.parse(localStorage.getItem(FL_NAME)) || ["Favoritos"];
-    let historyStack = [];
-    let filters = { type: 'all', status: 'all', folder: 'all', genre: 'all' };
+let db = JSON.parse(localStorage.getItem(DB)) || [];
+let folders = JSON.parse(localStorage.getItem(FL)) || ["Favoritos"];
+let undoStack = [];
+let filters = { type: 'all', status: 'all', folder: 'all', genre: 'all' };
+let currentSort = 'added';
+let winModal = null;
 
-    function save() { 
-        localStorage.setItem(DB_NAME, JSON.stringify(db)); 
-        localStorage.setItem(FL_NAME, JSON.stringify(folders));
-        render(); renderStats(); renderFolderBar(); renderGenreBar();
-    }
+// ─── SAVE / RENDER ────────────────────────────────────────────────
+function save() {
+    localStorage.setItem(DB, JSON.stringify(db));
+    localStorage.setItem(FL, JSON.stringify(folders));
+    render(); renderStats(); renderFolderBar(); renderGenreBar();
+}
 
-    function renderStats() {
-        const total = db.length;
-        const vistos = db.filter(i => i.status === 'Visto').length;
-        const aVer = db.filter(i => i.status === 'A Ver').length;
-        const paraVer = db.filter(i => i.status === 'Para Ver').length;
-        
-        document.getElementById('statsArea').innerHTML = `
-            <div class="stat-item">
-                <span class="stat-val">${total}</span>
-                <span class="stat-label">📚 Total</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-val">${vistos}</span>
-                <span class="stat-label">✅ Vistos</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-val">${aVer}</span>
-                <span class="stat-label">▶️ A Ver</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-val">${paraVer}</span>
-                <span class="stat-label">📌 Para Ver</span>
-            </div>
-        `;
-    }
+// ─── STATS ────────────────────────────────────────────────────────
+function renderStats() {
+    const total = db.length;
+    const vistos = db.filter(i => i.status === 'Visto').length;
+    const aVer = db.filter(i => i.status === 'A Ver').length;
+    const paraVer = db.filter(i => i.status === 'Para Ver').length;
+    const avgRating = db.filter(i => i.myRating > 0);
+    const avg = avgRating.length ? (avgRating.reduce((s, i) => s + i.myRating, 0) / avgRating.length).toFixed(1) : '—';
+    document.getElementById('statsArea').innerHTML = `
+        <div class="stat-pill"><span class="stat-num">${total}</span><span class="stat-lbl">Total</span></div>
+        <div class="stat-pill"><span class="stat-num">${vistos}</span><span class="stat-lbl">Vistos</span></div>
+        <div class="stat-pill"><span class="stat-num">${aVer}</span><span class="stat-lbl">A Ver</span></div>
+        <div class="stat-pill"><span class="stat-num">${paraVer}</span><span class="stat-lbl">Para Ver</span></div>
+        <div class="stat-pill"><span class="stat-num">${avg}</span><span class="stat-lbl">Nota Média</span></div>
+        <div class="stat-pill"><span class="stat-num">${db.filter(i=>i.type==='movie').length}</span><span class="stat-lbl">Filmes</span></div>
+        <div class="stat-pill"><span class="stat-num">${db.filter(i=>i.type==='tv').length}</span><span class="stat-lbl">Séries</span></div>
+    `;
+}
 
-    async function searchGlobal() {
-        const q = document.getElementById('term').value;
-        const box = document.getElementById('suggestions');
-        if(q.length < 2) { box.style.display = 'none'; return; }
-        
+// ─── SEARCH API ───────────────────────────────────────────────────
+let searchTimer;
+async function searchGlobal() {
+    const q = document.getElementById('term').value;
+    const box = document.getElementById('suggestions');
+    if (q.length < 2) { box.style.display = 'none'; return; }
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(async () => {
         const r = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${KEY}&query=${encodeURIComponent(q)}&language=pt-PT`);
         const d = await r.json();
-        
-        // CORREÇÃO: Usar onmousedown para evitar que o fechamento do modal cancele o clique
-        box.innerHTML = d.results
-            .filter(i => i.media_type !== 'person')
-            .slice(0,6)
-            .map(i => `
-                <div class="suggestion-item" onmousedown="add(${i.id}, '${i.media_type}')">
-                    <img src="${i.poster_path ? 'https://image.tmdb.org/t/p/w92'+i.poster_path : 'https://via.placeholder.com/92x138'}" style="width:35px; border-radius:6px;">
-                    <div class="fw-bold text-dark">${i.title || i.name}</div>
-                </div>`).join('');
-        box.style.display = 'block';
+        const results = d.results.filter(i => i.media_type !== 'person').slice(0, 7);
+        box.innerHTML = results.map(i => {
+            const already = db.some(x => x.id === i.id);
+            return `<div class="sugg-item" onmousedown="add(${i.id},'${i.media_type}')">
+                <img src="${i.poster_path ? 'https://image.tmdb.org/t/p/w92'+i.poster_path : 'https://via.placeholder.com/92x138/1a1c22/555?text=?'}">
+                <div>
+                    <div class="sugg-title">${i.title || i.name}</div>
+                    <div class="sugg-meta">${i.media_type === 'tv' ? 'Série' : 'Filme'} · ${(i.release_date || i.first_air_date || '').substring(0,4) || '?'}</div>
+                </div>
+                ${already ? '<span class="sugg-badge">✓ Adicionado</span>' : ''}
+            </div>`;
+        }).join('');
+        box.style.display = results.length ? 'block' : 'none';
+    }, 280);
+}
+
+// ─── ADD ──────────────────────────────────────────────────────────
+async function add(id, type) {
+    document.getElementById('suggestions').style.display = 'none';
+    document.getElementById('term').value = '';
+    if (db.some(x => x.id === id)) return;
+    const r = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${KEY}&language=pt-PT&append_to_response=recommendations`);
+    const i = await r.json();
+    db.unshift({
+        id: i.id, type, added: Date.now(),
+        title: i.title || i.name,
+        img: i.poster_path ? `https://image.tmdb.org/t/p/w500${i.poster_path}` : '',
+        bg: i.backdrop_path ? `https://image.tmdb.org/t/p/original${i.backdrop_path}` : '',
+        desc: i.overview || 'Sem sinopse disponível.',
+        score: i.vote_average ? i.vote_average.toFixed(1) : '?',
+        genres: i.genres?.map(g => g.name) || [],
+        status: 'Para Ver', folder: 'Nenhuma',
+        temporada: 1, episodio: 1,
+        myRating: 0,
+        notes: '',
+        watchedDate: '',
+        recs: i.recommendations?.results.slice(0, 8) || []
+    });
+    save();
+}
+
+// ─── FILTERS ──────────────────────────────────────────────────────
+function setFilter(key, value, el) {
+    filters[key] = value;
+    if (el) {
+        // only reset siblings of same data-group or same filter-row group
+        const group = el.dataset.group || key;
+        document.querySelectorAll(`.fp[data-group="${group}"], .fp[onclick*="'${key}'"]`).forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+    }
+    render();
+}
+
+// ─── SORT ─────────────────────────────────────────────────────────
+function sorted(arr) {
+    return [...arr].sort((a, b) => {
+        if (currentSort === 'title') return a.title.localeCompare(b.title);
+        if (currentSort === 'score') return parseFloat(b.score) - parseFloat(a.score);
+        if (currentSort === 'myrating') return (b.myRating || 0) - (a.myRating || 0);
+        if (currentSort === 'watched') return (b.watchedDate || '') > (a.watchedDate || '') ? 1 : -1;
+        return 0; // added = default order (unshift keeps newest first)
+    });
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────
+function render() {
+    const container = document.getElementById('myList');
+    const q = document.getElementById('localSearch').value.toLowerCase();
+    let filtered = db.filter(i => {
+        return (filters.type === 'all' || i.type === filters.type)
+            && (filters.status === 'all' || i.status === filters.status)
+            && (filters.folder === 'all' || i.folder === filters.folder)
+            && (filters.genre === 'all' || i.genres.includes(filters.genre))
+            && i.title.toLowerCase().includes(q);
+    });
+    filtered = sorted(filtered);
+
+    if (!filtered.length) {
+        container.innerHTML = `<div class="empty"><div class="empty-icon">🎬</div><div class="empty-txt">Nenhum resultado</div><p style="color:var(--text3);font-size:13px;margin-top:8px;">Tenta outro filtro ou adiciona algo novo.</p></div>`;
+        return;
     }
 
-    async function add(id, type) {
-        document.getElementById('suggestions').style.display = 'none';
-        document.getElementById('term').value = '';
-        
-        if(db.some(x => x.id === id)) return;
+    container.innerHTML = filtered.map(i => {
+        const statusClass = i.status === 'Visto' ? 'visto' : i.status === 'A Ver' ? 'a-ver' : 'para-ver';
+        const stars = i.myRating > 0 ? '★'.repeat(i.myRating) + '☆'.repeat(5 - i.myRating) : '';
+        const epLine = i.type === 'tv' ? `<div class="ep-label">T${i.temporada} E${i.episodio}</div>` : '';
+        const poster = i.img || `https://via.placeholder.com/300x450/1a1c22/555?text=${encodeURIComponent(i.title)}`;
+        return `
+        <div class="m-card" onclick="openModal(${i.id})">
+            <img class="m-card-poster" src="${poster}" loading="lazy">
+            <div class="status-dot ${statusClass}" title="${i.status}"></div>
+            <button class="del-btn" onclick="event.stopPropagation();remove(${i.id})" title="Apagar">✕</button>
+            <div class="m-card-body">
+                <div class="m-card-title">${i.title}</div>
+                <div class="m-card-meta">
+                    <span class="score-pill">⭐ ${i.score}</span>
+                    ${i.myRating > 0 ? `<span class="star-mini" title="A tua nota">${'★'.repeat(i.myRating)}</span>` : ''}
+                </div>
+                ${epLine}
+            </div>
+        </div>`;
+    }).join('');
+}
 
-        const r = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${KEY}&language=pt-PT&append_to_response=recommendations`);
-        const i = await r.json();
-        
-        db.unshift({
-            id: i.id, type: type, title: i.title || i.name,
-            img: i.poster_path ? `https://image.tmdb.org/t/p/w500${i.poster_path}` : 'https://via.placeholder.com/500x750',
-            bg: i.backdrop_path ? `https://image.tmdb.org/t/p/original${i.backdrop_path}` : 'https://via.placeholder.com/1280x720',
-            desc: i.overview || "Sem sinopse disponível.",
-            score: i.vote_average ? i.vote_average.toFixed(1) : '?',
-            genres: i.genres?.map(g => g.name) || [],
-            status: 'Para Ver', folder: 'Nenhuma',
-            temporada: 1, episodio: 1,
-            recs: i.recommendations?.results.slice(0, 6) || []
-        });
+// ─── FOLDER / GENRE BARS ─────────────────────────────────────────
+function renderFolderBar() {
+    const bar = document.getElementById('folderBar');
+    bar.innerHTML = `<button class="fp ${filters.folder==='all'?'active':''}" onclick="setFilter('folder','all',this)">Todas</button>`
+        + folders.map(f => `
+            <div style="display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:99px;padding:5px 12px;">
+                <span style="cursor:pointer;font-size:12px;font-weight:500;color:${filters.folder===f?'var(--gold)':'var(--text2)'};" onclick="setFilter('folder','${f}',null)">${f}</span>
+                <span style="cursor:pointer;font-size:10px;color:var(--text3);" onclick="deleteFolder('${f}')">✕</span>
+            </div>`).join('')
+        + `<button class="fp" onclick="newFolder()" style="border-style:dashed;">+ Pasta</button>`;
+}
+
+function renderGenreBar() {
+    const allG = [...new Set(db.flatMap(i => i.genres))].sort();
+    const bar = document.getElementById('genreBar');
+    if (!allG.length) { bar.innerHTML = ''; return; }
+    bar.innerHTML = `<button class="fp ${filters.genre==='all'?'active':''}" onclick="setFilter('genre','all',this)">Todos Géneros</button>`
+        + allG.map(g => `<button class="fp ${filters.genre===g?'active':''}" onclick="setFilter('genre','${g}',this)">${g}</button>`).join('');
+}
+
+// ─── MODAL ────────────────────────────────────────────────────────
+function openModal(id) {
+    const i = db.find(x => x.id === id);
+    if (!i) return;
+
+    const statusBadgeClass = i.status === 'Visto' ? 'badge-visto' : i.status === 'A Ver' ? 'badge-a-ver' : 'badge-para-ver';
+    const poster = i.img || `https://via.placeholder.com/300x450/1a1c22/555?text=${encodeURIComponent(i.title)}`;
+    const bg = i.bg || poster;
+
+    const starsHtml = [1,2,3,4,5].map(n =>
+        `<button class="star-btn ${i.myRating >= n ? 'active' : ''}" onclick="setRating(${id},${n})" title="${n} estrela${n>1?'s':''}">${i.myRating >= n ? '★' : '☆'}</button>`
+    ).join('');
+
+    const epSection = i.type === 'tv' ? `
+        <div class="ep-ctrl">
+            <span style="font-size:13px;color:var(--text2);flex:1;">Temporada <strong>${i.temporada}</strong> · Episódio <strong>${i.episodio}</strong></span>
+            <input type="number" class="ep-num-inp" value="${i.episodio}" min="1" onchange="update(${id},'episodio',parseInt(this.value)||1)" title="Episódio">
+            <button class="btn-g" onclick="nextEp(${id})" style="padding:5px 12px;font-size:12px;">+1 Ep</button>
+            <input type="number" class="ep-num-inp" value="${i.temporada}" min="1" onchange="update(${id},'temporada',parseInt(this.value)||1)" title="Temporada">
+            <span style="font-size:11px;color:var(--text3);">T</span>
+        </div>` : '';
+
+    const recsHtml = i.recs.length ? `
+        <div class="divider"></div>
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:10px;">Recomendações</div>
+        <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;">
+            ${i.recs.map(r => {
+                const alreadyIn = db.some(x => x.id === r.id);
+                return `<div class="rec-item ${alreadyIn?'rec-already':''}" onclick="${alreadyIn ? 'openModal('+r.id+')' : 'add('+r.id+",'"+ i.type +"')"}">
+                    <img src="${r.poster_path ? 'https://image.tmdb.org/t/p/w200'+r.poster_path : 'https://via.placeholder.com/200x300/1a1c22/555'}">
+                    <div class="rec-title">${r.title || r.name}</div>
+                </div>`;
+            }).join('')}
+        </div>` : '';
+
+    document.getElementById('winContent').innerHTML = `
+        <div class="modal-header-img-wrap">
+            <img src="${bg}" class="modal-header-img" onerror="this.src='${poster}'">
+        </div>
+        <div class="modal-inner">
+            <div style="display:flex;gap:16px;align-items:flex-end;margin-bottom:16px;">
+                <img src="${poster}" class="modal-poster" onerror="this.src='https://via.placeholder.com/300x450/1a1c22/555'">
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                        <div class="modal-title-txt">${i.title}</div>
+                        <button class="close-modal" onclick="closeModal()">✕</button>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center;">
+                        <span style="font-size:12px;color:var(--gold);font-weight:600;">⭐ ${i.score} TMDB</span>
+                        <span class="badge-status ${statusBadgeClass}">${i.status}</span>
+                        ${i.genres.slice(0,3).map(g => `<span class="gtag">${g}</span>`).join('')}
+                    </div>
+                    <div style="margin-top:10px;">
+                        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(i.title+' trailer')}" target="_blank" class="yt-btn">▶ Trailer</a>
+                    </div>
+                </div>
+            </div>
+
+            <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px;">${i.desc}</p>
+
+            ${epSection}
+            ${epSection ? '<div style="margin-bottom:12px;"></div>' : ''}
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+                <div>
+                    <span class="field-label">Status</span>
+                    <select class="sel" onchange="update(${id},'status',this.value)">
+                        <option ${i.status==='Para Ver'?'selected':''}>Para Ver</option>
+                        <option ${i.status==='A Ver'?'selected':''}>A Ver</option>
+                        <option ${i.status==='Visto'?'selected':''}>Visto</option>
+                    </select>
+                </div>
+                <div>
+                    <span class="field-label">Pasta</span>
+                    <select class="sel" onchange="update(${id},'folder',this.value)">
+                        <option value="Nenhuma">Nenhuma</option>
+                        ${folders.map(f => `<option value="${f}" ${i.folder===f?'selected':''}>${f}</option>`).join('')}
+                    </select>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+                <div>
+                    <span class="field-label">A minha nota</span>
+                    <div class="star-rating" id="starRow_${id}">${starsHtml}</div>
+                </div>
+                <div>
+                    <span class="field-label">Data em que vi</span>
+                    <input type="date" class="date-inp" value="${i.watchedDate||''}" onchange="update(${id},'watchedDate',this.value)">
+                </div>
+            </div>
+
+            <div style="margin-bottom:14px;">
+                <span class="field-label">Notas pessoais</span>
+                <textarea class="note-area" placeholder="Escreve aqui os teus comentários..." onchange="update(${id},'notes',this.value)">${i.notes||''}</textarea>
+            </div>
+
+            ${recsHtml}
+        </div>`;
+
+    winModal = new bootstrap.Modal(document.getElementById('win'));
+    winModal.show();
+}
+
+function closeModal() { if (winModal) winModal.hide(); }
+
+// ─── RATING ───────────────────────────────────────────────────────
+function setRating(id, val) {
+    const i = db.find(x => x.id === id);
+    if (!i) return;
+    i.myRating = i.myRating === val ? 0 : val; // toggle off if same
+    save();
+    // refresh stars in modal without closing
+    const row = document.getElementById(`starRow_${id}`);
+    if (row) {
+        row.innerHTML = [1,2,3,4,5].map(n =>
+            `<button class="star-btn ${i.myRating >= n ? 'active' : ''}" onclick="setRating(${id},${n})">${i.myRating >= n ? '★' : '☆'}</button>`
+        ).join('');
+    }
+}
+
+// ─── CRUD ─────────────────────────────────────────────────────────
+function remove(id) {
+    const idx = db.findIndex(x => x.id === id);
+    undoStack.push({ item: { ...db[idx] }, idx });
+    db.splice(idx, 1);
+    save();
+    const b = document.getElementById('undoBanner');
+    b.style.display = 'block';
+    clearTimeout(b._t);
+    b._t = setTimeout(() => b.style.display = 'none', 6000);
+}
+
+function undo() {
+    if (!undoStack.length) return;
+    const { item, idx } = undoStack.pop();
+    db.splice(idx, 0, item);
+    save();
+    document.getElementById('undoBanner').style.display = 'none';
+}
+
+function update(id, k, v) {
+    const i = db.find(x => x.id === id);
+    if (i) { i[k] = v; save(); }
+}
+
+function nextEp(id) {
+    const i = db.find(x => x.id === id);
+    i.episodio++;
+    save();
+    openModal(id);
+}
+
+function newFolder() {
+    const n = prompt('Nome da nova pasta:');
+    if (n && n.trim()) { folders.push(n.trim()); save(); }
+}
+
+function deleteFolder(name) {
+    if (confirm(`Remover pasta "${name}"?`)) {
+        folders = folders.filter(f => f !== name);
+        db.forEach(i => { if (i.folder === name) i.folder = 'Nenhuma'; });
         save();
     }
+}
 
-    function setFilter(key, value, el) {
-        filters[key] = value;
-        if(el) {
-            el.parentElement.querySelectorAll('.btn-tool').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
-        }
-        render();
-    }
+function pickRandom() {
+    if (!db.length) return;
+    const r = db[Math.floor(Math.random() * db.length)];
+    openModal(r.id);
+}
 
-    function render() {
-        const container = document.getElementById('myList');
-        const searchTerm = document.getElementById('localSearch').value.toLowerCase();
-        let filtered = db.filter(i => {
-            const mType = filters.type === 'all' || i.type === filters.type;
-            const mStatus = filters.status === 'all' || i.status === filters.status;
-            const mFolder = filters.folder === 'all' || i.folder === filters.folder;
-            const mGenre = filters.genre === 'all' || i.genres.includes(filters.genre);
-            const mSearch = i.title.toLowerCase().includes(searchTerm);
-            return mType && mStatus && mFolder && mGenre && mSearch;
-        });
+function exportJSON() {
+    const blob = new Blob([JSON.stringify({ db, folders })], { type: 'application/json' });
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'cinetrack_backup.json' });
+    a.click();
+}
 
-        container.innerHTML = filtered.map(i => `
-            <div class="m-card" onclick="openModal(${i.id})">
-                <img src="${i.img}">
-                <div class="card-title">${i.title}</div>
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-bold" style="color:var(--accent-gold); font-size:0.8rem">⭐ ${i.score}</span>
-                    <button class="btn btn-link p-0 text-danger text-decoration-none fw-bold" style="font-size:0.65rem" onclick="event.stopPropagation(); remove(${i.id})">APAGAR</button>
-                </div>
-            </div>`).join('');
-    }
+function importJSON(input) {
+    const reader = new FileReader();
+    reader.onload = e => {
+        try {
+            const data = JSON.parse(e.target.result);
+            db = data.db || data;
+            folders = data.folders || folders;
+            save();
+            alert('✅ Dados importados com sucesso!');
+        } catch { alert('❌ Erro ao importar o ficheiro.'); }
+    };
+    reader.readAsText(input.files[0]);
+}
 
-    function renderFolderBar() {
-        const bar = document.getElementById('folderBar');
-        bar.innerHTML = `<button class="btn-tool ${filters.folder === 'all' ? 'active' : ''}" onclick="setFilter('folder', 'all', this)">Todas Pastas</button>` + 
-            folders.map(f => `
-                <div style="display:inline-flex; align-items:center; background:white; border:2px solid #e2e8f0; border-radius:10px; padding:8px 12px; gap:8px;" class="${filters.folder === f ? 'active' : ''}">
-                    <span style="cursor:pointer; font-weight:700; font-size:0.85rem;" onclick="setFilter('folder', '${f}', this.parentElement)">${f}</span>
-                    <small class="text-danger fw-bold" style="cursor:pointer" onclick="deleteFolder('${f}')">✕</small>
-                </div>`).join('') +
-            `<button class="btn btn-sm btn-outline-warning fw-bold" onclick="newFolder()">+ NOVA PASTA</button>`;
-    }
+// ─── CLOSE SUGGESTIONS ON OUTSIDE CLICK ──────────────────────────
+document.addEventListener('mousedown', e => {
+    const t = document.getElementById('term');
+    const s = document.getElementById('suggestions');
+    if (!t.contains(e.target) && !s.contains(e.target)) s.style.display = 'none';
+});
 
-    function renderGenreBar() {
-        const bar = document.getElementById('genreBar');
-        const allG = [...new Set(db.flatMap(i => i.genres))].sort();
-        bar.innerHTML = `<button class="btn-tool ${filters.genre === 'all' ? 'active' : ''}" onclick="setFilter('genre', 'all', this)">Todos Géneros</button>` + 
-            allG.map(g => `<button class="btn-tool ${filters.genre === g ? 'active' : ''}" onclick="setFilter('genre', '${g}', this)">${g}</button>`).join('');
-    }
-
-    function openModal(id) {
-        const i = db.find(x => x.id === id);
-        if(!i) return;
-        const win = document.getElementById('winContent');
-        win.innerHTML = `
-            <img src="${i.bg}" class="modal-header-img">
-            <div class="p-4 pt-0" style="margin-top:-60px; position:relative">
-                <div class="d-flex gap-4 align-items-end mb-4">
-                    <img src="${i.img}" style="width:130px; border-radius:18px; border:5px solid white;">
-                    <div class="pb-2">
-                        <h3 class="fw-bold text-dark mb-1">${i.title}</h3>
-                        <span class="badge bg-warning text-dark me-2">⭐ ${i.score}</span>
-                        ${i.genres.map(g => `<span class="badge bg-light text-dark me-1">${g}</span>`).join('')}
-                        <div class="mt-2">
-                            <a href="https://www.youtube.com/results?search_query=${i.title} trailer" target="_blank" class="btn-youtube">▶️ Trailer YouTube</a>
-                        </div>
-                    </div>
-                </div>
-                ${i.type === 'tv' ? `<div class="bg-light p-3 rounded-4 mb-3 d-flex justify-content-between align-items-center border">
-                    <div class="fw-bold text-dark">Temporada ${i.temporada} | Episódio ${i.episodio}</div>
-                    <div class="d-flex gap-2">
-                        <input type="number" class="form-control form-control-sm" style="width:70px" value="${i.episodio}" onchange="update(${i.id}, 'episodio', this.value)">
-                        <button class="btn btn-sm btn-warning fw-bold" onclick="nextEp(${i.id})">+1 Ep</button>
-                    </div>
-                </div>` : ''}
-                <p class="text-muted small">${i.desc}</p>
-                <div class="row g-2 mt-3">
-                    <div class="col-6">
-                        <label class="small fw-bold text-muted">STATUS</label>
-                        <select class="form-select" onchange="update(${i.id}, 'status', this.value)">
-                            <option ${i.status === 'Para Ver' ? 'selected' : ''}>Para Ver</option>
-                            <option ${i.status === 'A Ver' ? 'selected' : ''}>A Ver</option>
-                            <option ${i.status === 'Visto' ? 'selected' : ''}>Visto</option>
-                        </select>
-                    </div>
-                    <div class="col-6">
-                        <label class="small fw-bold text-muted">PASTA</label>
-                        <select class="form-select" onchange="update(${i.id}, 'folder', this.value)">
-                            <option value="Nenhuma">Nenhuma</option>
-                            ${folders.map(f => `<option value="${f}" ${i.folder === f ? 'selected' : ''}>${f}</option>`).join('')}
-                        </select>
-                    </div>
-                </div>
-                ${i.recs.length > 0 ? `<h6 class="mt-4 fw-bold text-dark">RECOMENDAÇÕES</h6>
-                <div class="scroll-row">
-                    ${i.recs.map(r => `<div class="text-center" style="min-width:90px; cursor:pointer" onclick="add(${r.id}, '${i.type}')"><img src="https://image.tmdb.org/t/p/w200${r.poster_path}" class="rounded-3 w-100 mb-1"><div style="font-size:0.6rem; font-weight:bold" class="text-truncate">${r.title || r.name}</div></div>`).join('')}
-                </div>` : ''}
-            </div>`;
-        new bootstrap.Modal(document.getElementById('win')).show();
-    }
-
-    function remove(id) { const idx = db.findIndex(x => x.id === id); historyStack.push({...db[idx]}); db.splice(idx, 1); save(); showUndo(); }
-    function showUndo() { const b = document.getElementById('undoBanner'); b.style.display = 'block'; setTimeout(() => b.style.display = 'none', 6000); }
-    function undo() { if(historyStack.length) { db.unshift(historyStack.pop()); save(); } document.getElementById('undoBanner').style.display = 'none'; }
-    function update(id, k, v) { const i = db.find(x => x.id === id); if(i) { i[k] = v; save(); } }
-    function nextEp(id) { const i = db.find(x => x.id === id); i.episodio++; save(); openModal(id); }
-    function newFolder() { const n = prompt("Nome da nova pasta:"); if(n) { folders.push(n); save(); } }
-    function deleteFolder(name) { if(confirm(`Remover pasta "${name}"?`)) { folders = folders.filter(f => f !== name); db.forEach(i => { if(i.folder === name) i.folder = 'Nenhuma'; }); save(); } }
-    function pickRandom() { if(db.length > 0) { const r = db[Math.floor(Math.random()*db.length)]; openModal(r.id); } }
-    function exportJSON() { const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({db, folders})); const a = document.createElement('a'); a.href = data; a.download = "cinetrack_gold_backup.json"; a.click(); }
-    function importJSON(input) { const reader = new FileReader(); reader.onload = (e) => { try { const data = JSON.parse(e.target.result); db = data.db || data; folders = data.folders || folders; save(); alert("✅ Dados importados!"); } catch(err) { alert("Erro ao importar!"); } }; reader.readAsText(input.files[0]); }
-
-    // Evento de fechamento de sugestões corrigido
-    document.addEventListener('mousedown', (e) => {
-        const term = document.getElementById('term');
-        const sugg = document.getElementById('suggestions');
-        if(!term.contains(e.target) && !sugg.contains(e.target)) {
-            sugg.style.display = 'none';
-        }
-    });
-
-    window.onload = () => { render(); renderStats(); renderFolderBar(); renderGenreBar(); };
+// ─── INIT ─────────────────────────────────────────────────────────
+window.onload = () => { render(); renderStats(); renderFolderBar(); renderGenreBar(); };
 </script>
 </body>
 </html>
